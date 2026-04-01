@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GuidamiVDA — Guida turistica Valle d'Aosta</title>
+<meta name="description" content="Guida turistica interattiva della Valle d'Aosta: 204 schede tra hotel, ristoranti, escursioni, impianti sciistici e molto altro."/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f0ede8;--card:#fff;--text:#16181d;--soft:#7a7d85;--line:#e4e1db;
+  --accent:#2c5e3f;--accent-light:#e6efea;--accent-dark:#1b3d28;
+  --warm:#c08b5c;--warm-light:#faf3ec;
+  --snow:#4878a8;--snow-light:#eaf0f6;
+  --sun:#c9a033;--sun-light:#fdf8ec;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.04);
+  --shadow:0 8px 32px rgba(0,0,0,.08);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.12);
+  --shadow-xl:0 32px 80px rgba(0,0,0,.18);
+  --r:20px;--r-sm:12px;--max:1300px;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --body:'DM Sans',system-ui,sans-serif;
+  --display:'Instrument Serif',Georgia,serif;
+  --glass:rgba(255,255,255,.72);
+  --glass-border:rgba(255,255,255,.9);
+}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--body);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.6;overflow-x:hidden}
+html{scroll-behavior:smooth}
+img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inherit;text-decoration:none}p,h1,h2,h3,h4{margin:0}
+.container{width:min(var(--max),calc(100% - 40px));margin:0 auto}
+.hidden{display:none!important}
+
+/* ═══ TOPBAR ═══ */
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(32px) saturate(2);-webkit-backdrop-filter:blur(32px) saturate(2);background:rgba(240,237,232,.82);border-bottom:1px solid rgba(228,225,219,.4);transition:box-shadow .3s}
+.topbar.scrolled{box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.topbar-inner{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;transition:opacity .2s}
+.logo:hover{opacity:.7}
+.logo-mark{width:38px;height:38px;background:var(--accent-dark);border-radius:10px;display:grid;place-items:center;position:relative;overflow:hidden}
+.logo-mark::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent)}
+.logo-mark svg{position:relative;z-index:1}
+.logo-name{font-weight:800;font-size:19px;letter-spacing:-.03em}
+.logo-name em{color:var(--accent);font-style:normal}
+.logo-tag{font-size:10.5px;color:var(--soft);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-top:1px}
+.toolbar{display:flex;gap:8px;align-items:center}
+.btn{border:1.5px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:8px 15px;font-weight:600;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .25s var(--ease);white-space:nowrap;position:relative;overflow:hidden}
+.btn::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--bx,50%) var(--by,50%),rgba(255,255,255,.35),transparent 60%);opacity:0;transition:opacity .3s}
+.btn:hover::after{opacity:1}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);border-color:#ccc}
+.btn:active{transform:translateY(0) scale(.97)}
+.btn-accent{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff;transition:all .25s var(--ease),transform .15s var(--ease)}
+.btn-accent:hover{background:#264a33;box-shadow:0 4px 20px rgba(28,61,40,.35),0 0 0 1px rgba(44,94,63,.2)}
+.btn-ghost{background:transparent;border-color:transparent}
+.btn-ghost:hover{background:rgba(0,0,0,.04)}
+.btn-active{background:var(--accent-dark);border-color:var(--accent-dark);color:#fff}
+
+/* ═══ BREADCRUMB ═══ */
+.breadcrumb{padding:14px 0 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);font-weight:500}
+.breadcrumb button{color:var(--soft);background:none;border:none;padding:0;cursor:pointer;font-size:13px;font-weight:500;transition:color .15s}
+.breadcrumb button:hover{color:var(--text)}
+.breadcrumb .sep{opacity:.3}
+.breadcrumb .cur{color:var(--text);font-weight:700}
+
+/* ═══ ANIMATIONS ═══ */
+#app{animation:fadeUp .5s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-20px) scale(1.05)}}
+@keyframes auroraPulse{0%,100%{opacity:.55}50%{opacity:.8}}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes shimmer{from{background-position:-200% 0}to{background-position:200% 0}}
+
+/* ═══ HERO HOME ═══ */
+.hero{margin:20px 0;border-radius:28px;overflow:hidden;position:relative;min-height:300px;display:flex;align-items:flex-end}
+.hero-bg{position:absolute;inset:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;transition:transform 10s linear}
+.hero:hover .hero-bg img{transform:scale(1.04)}
+.hero-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,16,24,.92) 0%,rgba(10,16,24,.5) 40%,rgba(10,16,24,.1) 70%,transparent)}
+.hero-aurora{position:absolute;inset:0;pointer-events:none;z-index:1}
+.aurora-blob{position:absolute;border-radius:50%;filter:blur(70px);animation:float 9s ease-in-out infinite,auroraPulse 5s ease-in-out infinite}
+.aurora-1{width:500px;height:400px;top:-100px;left:-80px;background:radial-gradient(circle,rgba(44,94,63,.45),transparent 70%);animation-delay:0s}
+.aurora-2{width:400px;height:350px;top:0;right:-60px;background:radial-gradient(circle,rgba(72,120,168,.35),transparent 70%);animation-delay:-3s}
+.aurora-3{width:300px;height:300px;bottom:-50px;left:40%;background:radial-gradient(circle,rgba(201,160,51,.3),transparent 70%);animation-delay:-6s}
+.hero-content{position:relative;z-index:2;padding:32px 40px;width:100%}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.08);backdrop-filter:blur(12px);color:rgba(255,255,255,.9);font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border:1px solid rgba(255,255,255,.12);margin-bottom:10px}
+.hero h1{font-family:var(--display);font-size:clamp(26px,3.5vw,44px);line-height:1.05;color:#fff;font-weight:400;letter-spacing:-.02em;max-width:20ch;font-style:italic}
+.hero-gradient-text{background:linear-gradient(90deg,#fff 0%,rgba(109,201,146,1) 50%,#fff 100%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 4s linear infinite}
+.hero p{margin-top:8px;color:rgba(255,255,255,.6);max-width:60ch;font-size:14px;line-height:1.5}
+.hero-stats{display:flex;gap:24px;margin-top:16px}
+.hero-stat{color:rgba(255,255,255,.45);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.hero-stat strong{display:block;color:#fff;font-size:22px;font-family:var(--display);font-weight:400;font-style:italic;letter-spacing:-.01em;animation:countUp .6s var(--ease) both}
+
+/* ═══ SECTIONS ═══ */
+.section{margin-top:44px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px}
+.section-head h2{font-family:var(--display);font-size:30px;font-weight:400;font-style:italic;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.section-head h2::before{content:'';display:inline-block;width:4px;height:28px;background:var(--accent);border-radius:999px;flex-shrink:0}
+.section-head .sub{color:var(--soft);font-size:13.5px;margin-top:3px}
+
+/* ═══ BENTO MACRO GRID ═══ */
+.macro-grid{display:grid;gap:14px;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto}
+.macro-card:nth-child(1){grid-column:span 2;grid-row:span 1}
+.macro-card:nth-child(4){grid-column:span 2}
+
+/* ═══ MACRO CARD (3D tilt + spotlight) ═══ */
+.macro-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);cursor:pointer;animation:cardIn .5s var(--ease) both;position:relative;transform-style:preserve-3d;transition:box-shadow .4s var(--ease);will-change:transform}
+.macro-card:hover{box-shadow:var(--shadow-xl)}
+.mc-spotlight{position:absolute;inset:0;pointer-events:none;z-index:3;border-radius:var(--r);background:radial-gradient(circle 200px at var(--sx,50%) var(--sy,50%),rgba(255,255,255,.12),transparent 70%);opacity:0;transition:opacity .3s}
+.macro-card:hover .mc-spotlight{opacity:1}
+.mc-imgw{height:240px;overflow:hidden;position:relative;background:#ddd}
+.macro-card:nth-child(1) .mc-imgw,.macro-card:nth-child(4) .mc-imgw{height:280px}
+.mc-img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
+.macro-card:hover .mc-img{transform:scale(1.08)}
+.mc-imgw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(22,24,29,.82) 0%,rgba(22,24,29,.2) 55%,transparent)}
+.mc-over{position:absolute;left:16px;right:16px;bottom:16px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+.mc-emoji{font-size:22px;display:block;margin-bottom:4px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+.mc-name{color:#fff;font-family:var(--display);font-size:22px;font-weight:400;font-style:italic;text-shadow:0 2px 10px rgba(0,0,0,.4);line-height:1.1}
+.mc-comuni{color:rgba(255,255,255,.6);font-size:10.5px;margin-top:4px;font-weight:500;letter-spacing:.01em}
+.mc-count{background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-radius:999px;padding:4px 12px;font-size:10.5px;font-weight:800;color:var(--text);letter-spacing:.02em;flex-shrink:0}
+.mc-prem-badge{background:linear-gradient(135deg,#b8860b,#e8c55a);color:#3a2800;border-radius:999px;padding:3px 10px;font-size:10px;font-weight:800;letter-spacing:.04em;box-shadow:0 2px 8px rgba(184,134,11,.45);flex-shrink:0;white-space:nowrap}
+.mc-body{padding:14px 18px 18px}
+.mc-desc{color:var(--soft);font-size:12.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ═══ DEST CARD ═══ */
+.dest-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(285px,1fr))}
+.dest-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .35s var(--ease),box-shadow .35s var(--ease);cursor:pointer;animation:cardIn .45s var(--ease) both;position:relative}
+.dest-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.dest-card:hover .dc-img{transform:scale(1.06)}
+.dc-imgw{height:210px;overflow:hidden;position:relative;background:#ddd}
+.dc-img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.dc-imgw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(22,24,29,.7) 0%,transparent 55%)}
+.dc-over{position:absolute;left:14px;right:14px;bottom:14px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+.dc-name{color:#fff;font-family:var(--display);font-size:24px;font-weight:400;font-style:italic;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.dc-count{background:rgba(255,255,255,.88);backdrop-filter:blur(6px);border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:800;color:var(--text);letter-spacing:.02em}
+.dc-body{padding:16px 18px 20px}
+.dc-icons{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.icon-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;background:var(--bg);font-size:10.5px;font-weight:700;color:var(--soft)}
+.dc-desc{color:var(--soft);font-size:13px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dc-actions{display:flex;gap:8px;margin-top:14px}
+.view-all-card{background:var(--accent-light);border:2px dashed rgba(44,94,63,.3);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;cursor:pointer;transition:all .3s var(--ease);gap:12px}
+.view-all-card:hover{background:#d5e7dc;transform:translateY(-4px);box-shadow:var(--shadow)}
+.view-all-card .va-icon{width:52px;height:52px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center}
+.view-all-card span{font-weight:700;color:var(--accent-dark);font-size:14px}
+
+/* ═══ DEST PAGE HERO ═══ */
+.dest-hero{margin:20px 0;border-radius:28px;overflow:hidden;position:relative;min-height:360px;display:flex;align-items:flex-end}
+.dest-hero .hero-bg::after{background:linear-gradient(to top,rgba(22,24,29,.9) 0%,rgba(22,24,29,.35) 45%,transparent)}
+.dest-hero .hero-content{padding:40px 48px}
+.dest-hero h1{font-size:clamp(32px,4.5vw,56px);margin-top:0}
+.dest-hero-pills{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+.dest-hero-pills .icon-pill{background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.08)}
+.dest-hero-link{margin-top:14px}
+.dest-hero-link a{color:rgba(255,255,255,.6);font-size:13px;font-weight:600;border-bottom:1px solid rgba(255,255,255,.25);transition:color .2s}
+.dest-hero-link a:hover{color:#fff}
+
+/* ═══ FILTER BAR — GLASSMORPHISM ═══ */
+.filter-bar{background:rgba(255,255,255,.75);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border:1px solid rgba(255,255,255,.9);border-radius:var(--r);padding:20px 24px;box-shadow:0 8px 32px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.8);margin-top:20px;display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start}
+.fg{flex:1;min-width:160px}
+.fg-wide{flex:2;min-width:240px}
+.fl{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;color:var(--soft);margin-bottom:9px}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{border-radius:999px;padding:6px 13px;background:rgba(246,244,240,.8);border:1.5px solid transparent;font-weight:600;font-size:12.5px;color:var(--soft);cursor:pointer;transition:all .18s var(--ease);white-space:nowrap;backdrop-filter:blur(4px)}
+.chip:hover{color:var(--text);background:rgba(232,229,223,.9)}
+.chip.active{background:var(--accent-dark);color:#fff;border-color:var(--accent-dark);box-shadow:0 2px 10px rgba(28,61,40,.25)}
+.season-toggle{display:inline-flex;background:rgba(246,244,240,.8);border-radius:999px;padding:3px;border:1px solid var(--line);gap:2px;backdrop-filter:blur(4px)}
+.sbtn{padding:6px 14px;border-radius:999px;border:none;background:transparent;font-weight:700;font-size:12.5px;cursor:pointer;color:var(--soft);transition:all .2s var(--ease);display:flex;align-items:center;gap:4px}
+.sbtn:hover{color:var(--text)}
+.sbtn.active{background:var(--accent-dark);color:#fff;box-shadow:0 2px 8px rgba(28,61,40,.25)}
+.sbtn.active-snow{background:var(--snow);color:#fff;box-shadow:0 2px 8px rgba(72,120,168,.25)}
+.sbtn.active-sun{background:var(--sun);color:#fff;box-shadow:0 2px 8px rgba(201,160,51,.25)}
+.search-input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid rgba(228,225,219,.7);border-radius:999px;font-size:13px;font-weight:500;background:rgba(255,255,255,.7) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%237a7d85' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") 12px center no-repeat;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s;backdrop-filter:blur(4px)}
+.search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(44,94,63,.1),0 2px 8px rgba(0,0,0,.06)}
+.search-input::placeholder{color:var(--soft)}
+.results-info{font-size:12px;color:var(--soft);font-weight:500;margin-top:12px;display:flex;align-items:center;gap:6px}
+.results-info::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* ═══ COMUNE CHIPS ═══ */
+.comune-chips{display:flex;gap:6px;flex-wrap:wrap}
+.comune-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:rgba(246,244,240,.8);border:1.5px solid transparent;font-weight:600;font-size:12.5px;color:var(--soft);cursor:pointer;transition:all .2s var(--ease);white-space:nowrap;backdrop-filter:blur(4px)}
+.comune-chip:hover{color:var(--text);background:rgba(232,229,223,.9);border-color:#d5d1cb;transform:translateY(-1px)}
+.comune-chip.active{background:var(--accent-dark);color:#fff;border-color:var(--accent-dark);box-shadow:0 2px 12px rgba(28,61,40,.3)}
+.comune-chip .cc-count{background:rgba(255,255,255,.22);border-radius:999px;padding:1px 7px;font-size:10px;font-weight:700;letter-spacing:.02em}
+.comune-chip:not(.active) .cc-count{background:rgba(0,0,0,.07);color:var(--soft)}
+
+/* ═══ CARDS GRID ═══ */
+.cards-grid{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr))}
+
+.cat-hotel{--cat-color:#4878a8}
+.cat-ristoranti{--cat-color:#e05a3a}
+.cat-bar{--cat-color:#c9a033}
+.cat-cocktail{--cat-color:#7c5cbf}
+.cat-escursioni{--cat-color:#2c5e3f}
+.cat-attivita{--cat-color:#c08b5c}
+.cat-impianti{--cat-color:#4878a8}
+
+/* ═══ PLACE CARD ═══ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .35s var(--ease),box-shadow .35s var(--ease);cursor:pointer;animation:cardIn .4s var(--ease) both;position:relative}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cat-color,var(--accent));opacity:.8;z-index:1;transition:opacity .3s}
+.card:hover::before{opacity:1}
+.card:hover .c-img{transform:scale(1.05)}
+.c-imgw{height:195px;overflow:hidden;position:relative;background:#ddd}
+.c-img{width:100%;height:100%;object-fit:cover;transition:transform .5s var(--ease)}
+.c-imgw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(22,24,29,.5) 0%,transparent 45%)}
+.c-ot,.c-ob{position:absolute;left:12px;right:12px;z-index:2;display:flex;justify-content:space-between;gap:5px;align-items:center}
+.c-ot{top:11px}.c-ob{bottom:11px;align-items:flex-end}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.9);backdrop-filter:blur(4px);color:var(--text);font-size:10.5px;font-weight:800}
+.price{display:inline-flex;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.9);backdrop-filter:blur(4px);font-size:10.5px;font-weight:800}
+.price-1{color:#059669}.price-2{color:#65a30d}.price-3{color:#d97706}.price-4{color:#be123c}
+.c-body{padding:14px 16px 18px}
+.c-title{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.c-area{margin-top:3px;color:var(--soft);font-size:11.5px;font-weight:500}
+.c-desc{margin-top:7px;color:var(--soft);font-size:12.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-actions{display:flex;gap:7px;margin-top:11px}
+
+/* ═══ VETRINA CAROUSEL ═══ */
+.vetrina-section{margin-top:44px}
+.vetrina-arrows{display:flex;gap:8px;align-items:center}
+.vetrina-arrow{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--text);cursor:pointer;display:grid;place-items:center;transition:all .2s var(--ease);flex-shrink:0;box-shadow:var(--shadow-sm)}
+.vetrina-arrow:hover{background:var(--accent-dark);color:#fff;border-color:var(--accent-dark);transform:scale(1.08);box-shadow:var(--shadow)}
+/* wrapper: nasconde overflow ma permette drag */
+.vetrina-track-wrapper{overflow:hidden;width:100%;position:relative;padding:12px 0;cursor:grab;user-select:none}
+.vetrina-track-wrapper.is-dragging{cursor:grabbing}
+.vetrina-track-wrapper::before,.vetrina-track-wrapper::after{content:'';position:absolute;top:0;bottom:0;width:100px;z-index:2;pointer-events:none}
+.vetrina-track-wrapper::before{left:0;background:linear-gradient(to right,var(--bg) 10%,transparent)}
+.vetrina-track-wrapper::after{right:0;background:linear-gradient(to left,var(--bg) 10%,transparent)}
+.vetrina-track{display:flex;gap:16px;width:max-content;will-change:transform}
+/* card orizzontale strutturata */
+.v-card{width:260px;flex-shrink:0;border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .35s var(--ease),box-shadow .35s var(--ease);background:var(--card);box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column}
+.v-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.v-card.is-partner{border-color:rgba(201,160,51,.4);box-shadow:var(--shadow),0 0 0 1.5px rgba(201,160,51,.2)}
+.v-imgw{position:relative;height:160px;overflow:hidden;flex-shrink:0}
+.v-imgw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,16,24,.55) 0%,transparent 55%)}
+.v-img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.v-card:hover .v-img{transform:scale(1.08)}
+.v-top-badges{position:absolute;top:10px;left:10px;right:10px;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
+.v-type-badge{background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:3px 9px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.v-partner-badge{background:linear-gradient(135deg,#b8860b,#e8c55a);color:#3a2800;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:800;letter-spacing:.04em;box-shadow:0 2px 8px rgba(184,134,11,.4);white-space:nowrap}
+.v-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.v-title{font-family:var(--display);font-size:16px;font-style:italic;font-weight:400;color:var(--text);letter-spacing:-.01em;line-height:1.2}
+.v-meta{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.v-area{font-size:11px;color:var(--soft);font-weight:500}
+.v-price{font-size:11px;font-weight:700;color:var(--accent)}
+
+/* ═══ PREMIUM BADGE ═══ */
+.card.is-premium{border-color:rgba(201,160,51,.45);box-shadow:var(--shadow-sm),0 0 0 1.5px rgba(201,160,51,.25)}
+.card.is-premium::before{background:linear-gradient(90deg,#c9a033,#f0d060,#c9a033);background-size:200% 100%;animation:shimmer 2.5s linear infinite;opacity:1}
+.premium-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px 3px 7px;border-radius:999px;background:linear-gradient(135deg,#c9a033,#e8c55a);color:#7a5a00;font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 2px 8px rgba(201,160,51,.4);flex-shrink:0;line-height:1}
+.premium-badge svg{flex-shrink:0}
+
+/* ═══ EMPTY ═══ */
+.empty{padding:48px 24px;border:2px dashed var(--line);border-radius:var(--r);text-align:center;color:var(--soft);background:var(--card);grid-column:1/-1}
+.empty-icon{font-size:36px;margin-bottom:6px}
+
+/* ═══ MODAL — GLASSMORPHISM ═══ */
+.modal-bg{position:fixed;inset:0;background:rgba(10,16,24,.4);display:none;align-items:flex-end;justify-content:center;z-index:60;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.modal-bg.open{display:flex}
+.modal{width:min(860px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.92);backdrop-filter:blur(24px);border-radius:28px 28px 0 0;border:1px solid rgba(255,255,255,.9);border-bottom:none;box-shadow:0 -20px 80px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.9);animation:modalSlide .4s var(--spring) both}
+@keyframes modalSlide{from{transform:translateY(100%) scale(.98);opacity:.3}to{transform:none;opacity:1}}
+.modal-drag{width:40px;height:4px;background:var(--line);border-radius:999px;margin:12px auto 0}
+.modal-inner{padding:20px 28px 36px}
+.m-imgw{height:300px;border-radius:var(--r);overflow:hidden;position:relative;margin-bottom:20px;background:#ddd}
+.m-imgw img{width:100%;height:100%;object-fit:cover}
+.m-imgw::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(22,24,29,.65),transparent 50%)}
+.m-over{position:absolute;bottom:20px;left:20px;right:20px;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+.m-title{font-family:var(--display);font-size:30px;font-weight:400;font-style:italic;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3)}
+.m-sub{color:rgba(255,255,255,.75);font-size:13px;margin-top:3px}
+.close-btn{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.6);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;font-size:15px;cursor:pointer;z-index:4;transition:all .2s var(--spring)}
+.close-btn:hover{background:#fff;transform:scale(1.12) rotate(90deg)}
+.m-desc{color:var(--soft);font-size:15px;line-height:1.65;margin-bottom:20px}
+.m-desc-edit{width:100%;padding:12px 14px;border:1.5px solid var(--accent);border-radius:14px;font:inherit;font-size:14px;line-height:1.6;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:80px;margin-bottom:20px;transition:box-shadow .2s}
+.m-desc-edit:focus{box-shadow:0 0 0 3px rgba(44,94,63,.1)}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.info-box{border:1px solid rgba(228,225,219,.7);border-radius:16px;background:rgba(246,244,240,.6);padding:16px;backdrop-filter:blur(8px)}
+.info-box-label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;color:var(--soft);margin-bottom:10px}
+.info-row{display:flex;gap:8px;font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--line)}
+.info-row:last-child{border-bottom:none}
+.info-row strong{color:var(--soft);font-weight:600;min-width:80px;font-size:12.5px}
+
+/* ═══ EDIT OVERLAY ═══ */
+.edit-overlay{position:absolute;top:10px;right:10px;z-index:5;display:flex;gap:6px}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:999px}
+
+/* ═══ EDIT MODE BANNER ═══ */
+.edit-banner{background:linear-gradient(90deg,var(--accent-dark),#3a7a54);color:#fff;padding:9px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;font-weight:600;border-radius:var(--r);margin-top:14px;animation:fadeUp .3s var(--ease)}
+.edit-banner span{display:flex;align-items:center;gap:8px;opacity:.9;font-weight:400;font-size:12px}
+
+/* ═══ EDIT MODAL FORM ═══ */
+.edit-modal-form{width:min(760px,100%)}
+.edit-form-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.edit-form-header h3{font-family:var(--display);font-size:24px;font-weight:400;font-style:italic;display:flex;align-items:center;gap:10px}
+.edit-form-header h3 .ef-tag{font-family:var(--body);font-size:11px;font-style:normal;font-weight:700;background:var(--accent-light);color:var(--accent-dark);border-radius:999px;padding:3px 10px;letter-spacing:.04em;text-transform:uppercase}
+.ef-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.ef-field{display:flex;flex-direction:column;gap:6px}
+.ef-field.ef-full{grid-column:span 2}
+.ef-label{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--soft)}
+.ef-input,.ef-textarea,.ef-select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font:inherit;font-size:14px;background:#fff;color:var(--text);transition:border-color .2s,box-shadow .2s;outline:none}
+.ef-input:focus,.ef-textarea:focus,.ef-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(44,94,63,.1)}
+.ef-textarea{min-height:95px;resize:vertical;line-height:1.6}
+.ef-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7d85' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.ef-img-row{display:flex;align-items:center;gap:14px}
+.ef-img-thumb{width:90px;height:68px;object-fit:cover;border-radius:10px;border:2px solid var(--line);flex-shrink:0}
+.ef-checkbox-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;transition:border-color .2s}
+.ef-checkbox-row:hover{border-color:var(--accent)}
+.ef-checkbox-row input{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+.ef-checkbox-row span{font-size:13.5px;font-weight:600}
+.ef-actions{display:flex;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.ef-actions .btn{flex:1;justify-content:center}
+.edit-card-pulse{box-shadow:0 0 0 3px rgba(44,94,63,.5)!important;animation:editPulse 2s ease infinite}
+@keyframes editPulse{0%,100%{box-shadow:0 0 0 3px rgba(44,94,63,.5)}50%{box-shadow:0 0 0 6px rgba(44,94,63,.2)}}
+
+/* ═══ FOOTER ═══ */
+.footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--line);text-align:center;color:var(--soft);font-size:12.5px}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:1080px){
+  .cards-grid{grid-template-columns:repeat(2,1fr)}
+  .macro-grid{grid-template-columns:repeat(2,1fr)}
+  .macro-card:nth-child(1),.macro-card:nth-child(4){grid-column:span 2}
+}
+@media(max-width:720px){
+  :root{--r:14px;--r-sm:9px}
+  .container{width:calc(100% - 28px)}
+  .cards-grid,.m-grid{grid-template-columns:1fr}
+  .macro-grid{grid-template-columns:1fr}
+  .macro-card:nth-child(1),.macro-card:nth-child(4){grid-column:span 1}
+  .hero{border-radius:18px;min-height:240px}
+  .hero-content,.dest-hero .hero-content{padding:20px 20px 24px}
+  .hero h1{font-size:clamp(22px,6vw,32px)}
+  .hero-stats{gap:14px;flex-wrap:wrap}
+  .hero-stat strong{font-size:18px}
+  .filter-bar{flex-direction:column;gap:10px;padding:16px}
+  .toolbar{width:100%;justify-content:flex-end;flex-wrap:wrap;gap:6px}
+  .btn{padding:7px 12px;font-size:12px}
+  .topbar-inner{padding:8px 0;gap:8px}
+  .logo-name{font-size:16px}
+  .logo-tag{display:none}
+  .logo-mark{width:32px;height:32px}
+  .dest-grid{grid-template-columns:1fr 1fr}
+  .section{margin-top:28px}
+  .section-head h2{font-size:22px}
+  /* vetrina mobile: card più strette */
+  .v-card{width:200px}
+  .v-imgw{height:130px}
+  .v-title{font-size:14px}
+  /* modal mobile */
+  .modal{border-radius:20px 20px 0 0;margin-top:auto;max-height:92vh}
+  .m-imgw{height:200px}
+  .m-grid{grid-template-columns:1fr}
+  /* macro card */
+  .mc-imgw{height:180px}
+  .macro-card:nth-child(1) .mc-imgw,.macro-card:nth-child(4) .mc-imgw{height:180px}
+  .mc-name{font-size:18px}
+  /* filter chips scroll orizzontale */
+  .chips,.season-toggle,.comune-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
+  .chips::-webkit-scrollbar,.season-toggle::-webkit-scrollbar,.comune-chips::-webkit-scrollbar{display:none}
+  /* edit form */
+  .ef-grid{grid-template-columns:1fr}
+  .ef-full{grid-column:span 1}
+}
+@media(max-width:480px){
+  .dest-grid{grid-template-columns:1fr}
+  .hero-eyebrow{font-size:10px;padding:4px 10px}
+  .cards-grid{gap:10px}
+  .v-card{width:170px}
+  .v-imgw{height:110px}
+  .toolbar .btn span{display:none}
+}</style>
+</head>
+<body>
+<div id="scrollProgress" style="position:fixed;top:0;left:0;height:2.5px;width:0%;background:linear-gradient(90deg,#2c5e3f,#6dc992,#c9a033);z-index:9999;transition:width .1s linear;pointer-events:none"></div>
+
+<div class="topbar">
+  <div class="topbar-inner container">
+    <div class="logo" onclick="nav('home')">
+      <div class="logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L3 20h18L12 2z" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M12 2L15 10H9L12 2z" fill="#6dc992" opacity=".9"/>
+          <circle cx="12" cy="16" r="1.2" fill="#6dc992"/>
+          <circle cx="14" cy="13" r="1" fill="#6dc992" opacity=".6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-name">Guidami<em>VDA</em></div>
+        <div class="logo-tag">Valle d'Aosta</div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <span id="adminTools" style="display:none;gap:6px;align-items:center">
+      <label class="btn" for="xlsInput">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Carica Excel
+      </label>
+      <input id="xlsInput" type="file" accept=".xlsx,.xls" class="hidden"/>
+      <button class="btn" onclick="downloadExcel()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 11V1M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Scarica Excel
+      </button>
+      <button id="editModeBtn" class="btn" onclick="toggleEditMode()">&#x270F;&#xFE0F; Modifica</button>
+      </span>
+      <button id="reloadBtn" class="btn btn-ghost">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 .5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 3v3h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Ricarica
+      </button>
+    </div>
+  </div>
+</div>
+
+<nav id="bc" class="breadcrumb container hidden"></nav>
+<main id="app"></main>
+<div id="modalBg" class="modal-bg"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+/* MACRO AREAS */
+const MACRO_AREAS = [
+  { id: "monte-bianco", name: "Monte Bianco", emoji: "🏔️", desc: "Courmayeur, La Thuile, Pre-Saint-Didier, Morgex — il tetto d'Europa.", dests: ["courmayeur","la-thuile","pre-saint-didier","morgex"], image: "https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=1600&q=80", color: "#4878a8" },
+  { id: "gran-paradiso", name: "Gran Paradiso", emoji: "🦅", desc: "Cogne e il Parco Nazionale del Gran Paradiso — natura incontaminata.", dests: ["cogne"], image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80", color: "#2c5e3f" },
+  { id: "gran-san-bernardo", name: "Gran San Bernardo", emoji: "🐕", desc: "L'antico valico alpino — storia, spiritualità e paesaggi d'alta quota.", dests: [], image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80", color: "#c9a033" },
+  { id: "cervino-monte-rosa", name: "Cervino / Monte Rosa", emoji: "⛷️", desc: "Breuil-Cervinia, Champoluc (Val d'Ayas) e Gressoney (Valle del Lys).", dests: ["cervinia","champoluc","gressoney"], image: "https://images.unsplash.com/photo-1580137189272-c9379f8864fd?auto=format&fit=crop&w=1600&q=80", color: "#7c5cbf" },
+  { id: "aosta-valle-centrale", name: "Aosta e Valle Centrale", emoji: "🏛️", desc: "Aosta, Pila, Saint-Vincent, Bard — storia romana e belle époque.", dests: ["aosta","pila","saint-vincent","bard"], image: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1600&q=80", color: "#c08b5c" },
+];
+
+/* DATA */
+const FALLBACK_DATA = {"destinations":[{"slug":"courmayeur","name":"Courmayeur","seasonality":"Entrambi","description":"Elegante stazione ai piedi del Monte Bianco: sci world-class, Skyway, trekking in Val Ferret e alta ristorazione.","icons":"sci;escursioni;paese;esperienze;wellness","image":"https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=1600&q=80","website":"https://www.courmayeurmontblanc.it"},{"slug":"cervinia","name":"Breuil-Cervinia","seasonality":"Entrambi","description":"Alta quota ai piedi del Cervino: sci fino a 3.883 m collegato a Zermatt, panorami mozzafiato.","icons":"sci;escursioni;paese;esperienze","image":"https://images.unsplash.com/photo-1580137189272-c9379f8864fd?auto=format&fit=crop&w=1600&q=80","website":"https://www.cervinia.it"},{"slug":"la-thuile","name":"La Thuile","seasonality":"Entrambi","description":"Il lato wild delle Alpi: sci internazionale Espace San Bernardo, bike park e trekking.","icons":"sci;escursioni;paese","image":"https://images.unsplash.com/photo-1520962880247-cfaf541c8724?auto=format&fit=crop&w=1600&q=80","website":"https://www.lathuile.it"},{"slug":"cogne","name":"Cogne","seasonality":"Entrambi","description":"Porta del Gran Paradiso: natura incontaminata, cascate di Lillaz, sci di fondo e charme.","icons":"escursioni;paese;wellness","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1600&q=80","website":"https://www.cogneturismo.it"},{"slug":"pila","name":"Pila","seasonality":"Entrambi","description":"Ski resort sopra Aosta: telecabina dal centro città, 70 km di piste e bike park estivo.","icons":"sci;escursioni;paese;esperienze","image":"https://images.unsplash.com/photo-1551524559-8af4e6624178?auto=format&fit=crop&w=1600&q=80","website":"https://www.pila.it"},{"slug":"aosta","name":"Aosta","seasonality":"Entrambi","description":"La Roma delle Alpi: archeologia romana, centro storico medievale, enogastronomia e castelli.","icons":"citta;escursioni;esperienze","image":"https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=1600&q=80","website":"https://www.lovevda.it/it/scopri/aosta"},{"slug":"champoluc","name":"Champoluc","seasonality":"Entrambi","description":"Val d’Ayas e Monterosa Ski: sci, villaggi walser, benessere e panorami sul Rosa.","icons":"sci;escursioni;paese;wellness","image":"https://images.unsplash.com/photo-1551524559-8af4e6624178?auto=format&fit=crop&w=1600&q=80","website":"https://visitmonterosa.com"},{"slug":"saint-vincent","name":"Saint-Vincent","seasonality":"Entrambi","description":"Elegante località: terme, Casinò de la Vallée, eventi culturali e relax.","icons":"paese;citta;wellness;esperienze","image":"https://images.unsplash.com/photo-1571003872-d4d27b88f109?auto=format&fit=crop&w=1600&q=80","website":"https://www.saintvincent.vda.it"},{"slug":"pre-saint-didier","name":"Pré-Saint-Didier","seasonality":"Entrambi","description":"Borgo termale ai piedi del Monte Bianco: QC Terme, orrido e atmosfera rilassante.","icons":"wellness;paese;esperienze","image":"https://images.unsplash.com/photo-1519449556851-a21b57c14028?auto=format&fit=crop&w=1600&q=80","website":"https://www.qcterme.com/it/pre-saint-didier"},{"slug":"gressoney","name":"Gressoney","seasonality":"Entrambi","description":"Cultura walser e Monterosa Ski: Castel Savoia, sci, trekking e tradizioni alpine.","icons":"sci;escursioni;paese;esperienze","image":"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80","website":"https://www.lovevda.it/it/scopri/gressoney"},{"slug":"bard","name":"Bard","seasonality":"Entrambi","description":"Forte di Bard: polo culturale con mostre, Museo delle Alpi e borgo medievale.","icons":"citta;esperienze;paese","image":"https://images.unsplash.com/photo-1533929736562-7fc2f4b5bfa5?auto=format&fit=crop&w=1600&q=80","website":"https://www.fortedibard.it"},{"slug":"morgex","name":"Morgex","seasonality":"Entrambi","description":"Patria del vino Blanc de Morgex: vigneti eroici, Café Quinson e tradizioni enologiche.","icons":"paese;esperienze;escursioni","image":"https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1600&q=80","website":"https://www.lovevda.it/it/scopri/morgex"}],"places":[{"destination":"courmayeur","title":"Grand Hotel Royal e Golf","type":"Hotel","area":"Centro paese","price":"€€€€","season":"Entrambi","desc":"Hotel 5 stelle storico in Via Roma con spa, piscina e giardino panoramico.","website":"https://www.hotelroyalegolf.com","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"grand-hotel-royal-e-golf","premium":true},{"destination":"courmayeur","title":"Auberge de la Maison","type":"Hotel","area":"Entrèves","price":"€€€€","season":"Entrambi","desc":"Relais di charme a Entrèves con ristorante premiato e vista Monte Bianco.","website":"https://www.aubergemaison.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"auberge-de-la-maison"},{"destination":"courmayeur","title":"Hotel Croux","type":"Hotel","area":"Centro paese","price":"€€€","season":"Entrambi","desc":"Hotel 3 stelle curato e centralissimo, comodo per tutte le attività.","website":"https://www.hotelcroux.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-croux"},{"destination":"courmayeur","title":"Gran Baita Hotel & Wellness","type":"Hotel","area":"Centro paese","price":"€€€€","season":"Entrambi","desc":"Hotel 4 stelle con centro wellness, piscina e ristorante di cucina alpina.","website":"https://www.hotgranbaitacourmayeur.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"gran-baita-hotel-wellness"},{"destination":"courmayeur","title":"Hotel Bouton d'Or","type":"Hotel","area":"Centro paese","price":"€€€","season":"Entrambi","desc":"Hotel accogliente in posizione strategica a pochi passi dalla Via Roma.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-bouton-d-or"},{"destination":"courmayeur","title":"Villa Novecento","type":"Hotel","area":"Centro","price":"€€€€","season":"Entrambi","desc":"Boutique hotel romantico con arredi d'epoca e atmosfera intima.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"villa-novecento"},{"destination":"courmayeur","title":"Skyway Monte Bianco","type":"Attività","area":"Entrèves","price":"€€€€","season":"Entrambi","desc":"Funivia rotante verso Punta Helbronner a 3.466 m: panorama a 360° sulle Alpi.","website":"https://www.montebianco.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"skyway-monte-bianco","premium":true},{"destination":"courmayeur","title":"Courmayeur Mont Blanc Ski","type":"Impianti sciistici","area":"Plan Chécrouit / Val Veny","price":"€€€€","season":"Inverno","desc":"Comprensorio con piste panoramiche sul Monte Bianco e fuoripista leggendari.","website":"https://www.courmayeurmontblanc.it","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"courmayeur-mont-blanc-ski"},{"destination":"courmayeur","title":"Val Ferret","type":"Escursioni","area":"Val Ferret","price":"€","season":"Estate","desc":"Passeggiate sceniche ai piedi del Monte Bianco tra prati alpini e ghiacciai.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"val-ferret"},{"destination":"courmayeur","title":"Val Veny","type":"Escursioni","area":"Val Veny","price":"€","season":"Estate","desc":"Valle glaciale spettacolare con vista sul Miage e sentieri per tutti i livelli.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"val-veny"},{"destination":"courmayeur","title":"Tour Monte Bianco - Tappa Italiana","type":"Escursioni","area":"Rifugio Bonatti","price":"€","season":"Estate","desc":"Tappa iconica del TMB: dal Rifugio Bertone al Bonatti con vista sul massiccio.","website":"https://www.autourdumontblanc.com","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"tour-monte-bianco-tappa-italiana"},{"destination":"courmayeur","title":"Lago Chécrouit","type":"Escursioni","area":"Plan Chécrouit","price":"€","season":"Estate","desc":"Facile passeggiata in quota con lago alpino e panorama sul Monte Bianco.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-checrouit"},{"destination":"courmayeur","title":"Pierre Alexis 1877","type":"Ristoranti","area":"Via Marconi","price":"€€€€","season":"Entrambi","desc":"Cucina alpina raffinata con 2 forchette Gambero Rosso: piatti creativi e cantina eccellente.","website":"https://www.pierrealexiscourmayeur.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"pierre-alexis-1877"},{"destination":"courmayeur","title":"Cadran Solaire","type":"Ristoranti","area":"Via Roma","price":"€€€","season":"Entrambi","desc":"Ristorante storico della famiglia Garin: cotoletta alla valdostana, polenta e piatti di tradizione.","website":"https://www.cadransolaire.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"cadran-solaire"},{"destination":"courmayeur","title":"Lo Sciatore & Fuoripista","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Doppia anima: steakhouse con carni di qualità e pizzeria gourmet con forno a legna.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"lo-sciatore-fuoripista"},{"destination":"courmayeur","title":"Les Jorasses","type":"Ristoranti","area":"Via Roma","price":"€€€€","season":"Entrambi","desc":"Cucina italiana contemporanea in ambiente sofisticato, ottima carta dei vini alpini.","website":"https://www.lesjorassesrestaurant.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"les-jorasses"},{"destination":"courmayeur","title":"Brasserie La Sapinière","type":"Ristoranti","area":"Centro","price":"€€€€","season":"Entrambi","desc":"Ristorante elegante con cucina creativa e ambiente raffinato.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"brasserie-la-sapiniere"},{"destination":"courmayeur","title":"Chapeau Courmayeur","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Nuovo ristorante sotto i portici: tradizione alpina con tocco contemporaneo.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"chapeau-courmayeur"},{"destination":"courmayeur","title":"L'Armadillo","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Bistrot con cucina creativa e hamburger gourmet, 1 forchetta Gambero Rosso.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"l-armadillo"},{"destination":"courmayeur","title":"Caffè della Posta 1911","type":"Bar","area":"Via Roma","price":"€€","season":"Entrambi","desc":"Caffè storico dal 1911 riaperto con pasticceria artigianale e cocktail bar.","website":"https://www.caffedellaposta.it","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"caffe-della-posta-1911"},{"destination":"courmayeur","title":"Caffè delle Guide","type":"Bar","area":"Via Roma","price":"€€","season":"Entrambi","desc":"Storico caffè della Società delle Guide Alpine, atmosfera autentica di montagna.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"caffe-delle-guide"},{"destination":"courmayeur","title":"Privé Wine Bar","type":"Cocktail bar","area":"Via Roma","price":"€€€","season":"Entrambi","desc":"Wine bar intimo con selezione di vini valdostani e cocktail d'autore.","website":"","image":"https://images.unsplash.com/photo-1527761939622-933c470e8a2b?auto=format&fit=crop&w=1200&q=80","slug":"prive-wine-bar"},{"destination":"courmayeur","title":"Bar Roma","type":"Bar","area":"Via Roma","price":"€€","season":"Entrambi","desc":"Bar nel cuore della passeggiata, ideale per aperitivo con vista sulla Via Roma.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-roma"},{"destination":"courmayeur","title":"Giardino Botanico Saussurea","type":"Attività","area":"Skyway - Pavillon","price":"€€","season":"Estate","desc":"Giardino alpino a 2.173 m con oltre 900 specie di piante: il più alto d'Europa.","website":"https://www.montebianco.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"giardino-botanico-saussurea"},{"destination":"courmayeur","title":"Courmayeur Golf Club","type":"Attività","area":"Plan Gorret","price":"€€€","season":"Estate","desc":"Campo da golf panoramico a 1.524 m ai piedi del Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"courmayeur-golf-club"},{"destination":"cervinia","title":"VRetreats Cervino","type":"Hotel","area":"Breuil-Cervinia","price":"€€€€","season":"Entrambi","desc":"Hotel luxury con spa premium e camere con vista diretta sul Cervino.","website":"https://www.vretreats.com/cervino","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"vretreats-cervino","premium":true},{"destination":"cervinia","title":"Hermitage Hotel & Spa","type":"Hotel","area":"Panoramica","price":"€€€€","season":"Entrambi","desc":"Relais & Châteaux con ristorante La Chandelle e spa con vista Cervino.","website":"https://hotelhermitage.com","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hermitage-hotel-spa","premium":true},{"destination":"cervinia","title":"Hotel Bucaneve","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel accogliente con ottimo rapporto qualità-prezzo vicino agli impianti.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-bucaneve"},{"destination":"cervinia","title":"Saint Hubertus Resort","type":"Hotel","area":"Centro","price":"€€€€","season":"Entrambi","desc":"Resort con suite eleganti, ristorante gourmet e centro benessere.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"saint-hubertus-resort"},{"destination":"cervinia","title":"Hotel Punta Maquignaz","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel familiare con vista Cervino, ristorante e posizione comoda per le piste.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-punta-maquignaz"},{"destination":"cervinia","title":"Cervino Ski Paradise","type":"Impianti sciistici","area":"Cervinia / Zermatt","price":"€€€€","season":"Inverno","desc":"360 km di piste collegate con Zermatt fino a 3.883 m: sci anche in estate.","website":"https://www.cervinia.it","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"cervino-ski-paradise"},{"destination":"cervinia","title":"Plateau Rosa","type":"Impianti sciistici","area":"Alta quota","price":"€€€€","season":"Inverno","desc":"Punto più alto del comprensorio a 3.480 m: sci su ghiacciaio e vista sulle Alpi.","website":"https://www.cervinia.it","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"plateau-rosa"},{"destination":"cervinia","title":"Lago Blu","type":"Escursioni","area":"Breuil","price":"€","season":"Estate","desc":"Passeggiata breve e iconica: lago alpino con riflesso perfetto del Cervino.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-blu"},{"destination":"cervinia","title":"Grande Balconata del Cervino","type":"Escursioni","area":"Valtournenche","price":"€","season":"Estate","desc":"Trekking a tappe con panorami spettacolari sul Cervino e valli circostanti.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"grande-balconata-del-cervino"},{"destination":"cervinia","title":"Sentiero dei Laghi","type":"Escursioni","area":"Cervinia","price":"€","season":"Estate","desc":"Percorso panoramico tra i laghi alpini sopra Cervinia con vista sul Cervino.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"sentiero-dei-laghi"},{"destination":"cervinia","title":"Rifugio Duca degli Abruzzi","type":"Escursioni","area":"Oriondé","price":"€","season":"Estate","desc":"Escursione al rifugio storico con vista ravvicinata sul Cervino.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"rifugio-duca-degli-abruzzi"},{"destination":"cervinia","title":"La Chandelle","type":"Ristoranti","area":"Hotel Hermitage","price":"€€€€","season":"Entrambi","desc":"Alta cucina valdostana con vista Cervino, 2 forchette Gambero Rosso.","website":"https://hotelhermitage.com","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"la-chandelle"},{"destination":"cervinia","title":"Wood Restaurant","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Cucina creativa e sostenibile, Forchetta Verde Gambero Rosso.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"wood-restaurant"},{"destination":"cervinia","title":"Saint Hubertus Restaurant","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Ristorante di cucina valdostana con 1 forchetta Gambero Rosso.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"saint-hubertus-restaurant"},{"destination":"cervinia","title":"Copa Pan","type":"Ristoranti","area":"Piste","price":"€€€","season":"Inverno","desc":"Ristorante panoramico sulle piste con vista mozzafiato sul Cervino.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"copa-pan"},{"destination":"cervinia","title":"Les Clochards","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Pub e après-ski storico di Cervinia, punto di ritrovo serale.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"les-clochards"},{"destination":"cervinia","title":"Dragon Bar","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Bar accogliente per après-ski con musica live e atmosfera vivace.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"dragon-bar"},{"destination":"cervinia","title":"Cervinia Bike Park","type":"Attività","area":"Cervinia","price":"€€","season":"Estate","desc":"Bike park in quota con tracciati downhill e freeride serviti da impianti.","website":"https://www.cervinia.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"cervinia-bike-park"},{"destination":"cervinia","title":"Indian Park Cervinia","type":"Attività","area":"Cervinia","price":"€€","season":"Estate","desc":"Parco avventura con percorsi tra gli alberi per famiglie e ragazzi.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"indian-park-cervinia"},{"destination":"la-thuile","title":"Montana Lodge & Spa","type":"Hotel","area":"Centro / impianti","price":"€€€€","season":"Entrambi","desc":"Hotel 4* superior con Bistrò Alpino premiato e ampia spa panoramica.","website":"https://www.montanalodge.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"montana-lodge-spa","premium":true},{"destination":"la-thuile","title":"Hotel Planibel","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Residence hotel con piscina, centro congressi e accesso diretto alle piste.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-planibel","premium":true},{"destination":"la-thuile","title":"Chalet Eden","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel chalet con atmosfera familiare e cucina casalinga valdostana.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"chalet-eden"},{"destination":"la-thuile","title":"Espace San Bernardo","type":"Impianti sciistici","area":"La Thuile / La Rosière","price":"€€€€","season":"Inverno","desc":"Comprensorio internazionale Italia-Francia con skipass unico: 160 km di piste.","website":"https://www.espacesanbernardo.ski","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"espace-san-bernardo"},{"destination":"la-thuile","title":"Cascate del Rutor","type":"Escursioni","area":"La Thuile","price":"€","season":"Estate","desc":"Tre cascate spettacolari dal ghiacciaio del Rutor con passerella panoramica.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"cascate-del-rutor"},{"destination":"la-thuile","title":"Lago di Arpy","type":"Escursioni","area":"La Thuile","price":"€","season":"Estate","desc":"Escursione facile al lago con vista spettacolare sul Monte Bianco.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-di-arpy"},{"destination":"la-thuile","title":"Colle del Piccolo San Bernardo","type":"Escursioni","area":"Confine IT-FR","price":"€","season":"Estate","desc":"Valico storico con giardino alpino Chanousia e resti romani.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"colle-del-piccolo-san-bernardo"},{"destination":"la-thuile","title":"Enduro MTB Park","type":"Attività","area":"La Thuile","price":"€€","season":"Estate","desc":"Bike park con tracciati enduro e downhill serviti dagli impianti.","website":"https://www.lathuile.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"enduro-mtb-park"},{"destination":"la-thuile","title":"Bistrò Alpino","type":"Ristoranti","area":"Montana Lodge","price":"€€€","season":"Entrambi","desc":"Cucina contemporanea al Montana Lodge, 1 forchetta Gambero Rosso.","website":"https://www.montanalodge.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"bistro-alpino"},{"destination":"la-thuile","title":"La Fordze","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Trattoria valdostana autentica con fonduta, polenta e carbonade.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"la-fordze"},{"destination":"la-thuile","title":"Lo Ratèl","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Ristorante con cucina di montagna ricercata e buona carta dei vini.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"lo-ratel"},{"destination":"la-thuile","title":"Rafting Dora Baltea","type":"Attività","area":"La Thuile","price":"€€","season":"Estate","desc":"Discesa in rafting sulle rapide della Dora Baltea tra scenari alpini.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"rafting-dora-baltea"},{"destination":"la-thuile","title":"Arrampicata sportiva","type":"Attività","area":"La Thuile","price":"€€","season":"Estate","desc":"Falesie attrezzate per arrampicata con guide alpine certificate.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"arrampicata-sportiva"},{"destination":"la-thuile","title":"Bar de La Thuile","type":"Bar","area":"Centro","price":"€","season":"Entrambi","desc":"Bar del paese per caffè mattutino e aperitivo con vista sulle montagne.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-de-la-thuile"},{"destination":"la-thuile","title":"Le Mirtillo","type":"Bar","area":"Piste","price":"€€","season":"Inverno","desc":"Bar ristoro sulle piste, perfetto per una pausa tra una discesa e l'altra.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"le-mirtillo"},{"destination":"cogne","title":"Bellevue Hotel & Spa","type":"Hotel","area":"Centro paese","price":"€€€€","season":"Entrambi","desc":"Storico hotel di charme con spa, ristorante gourmet e giardino panoramico.","website":"https://www.hotelbellevue.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"bellevue-hotel-spa","premium":true},{"destination":"cogne","title":"Hotel Sant'Orso","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel tradizionale con ristorante di cucina valdostana e vista sui prati.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-sant-orso"},{"destination":"cogne","title":"La Madonnina del Gran Paradiso","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel con piscina coperta, centro benessere e posizione tranquilla.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"la-madonnina-del-gran-paradiso","premium":true},{"destination":"cogne","title":"Hotel du Grand Paradis","type":"Hotel","area":"Centro","price":"€€","season":"Entrambi","desc":"Hotel familiare con buon rapporto qualità-prezzo nel cuore di Cogne.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-du-grand-paradis"},{"destination":"cogne","title":"Cascate di Lillaz","type":"Escursioni","area":"Lillaz","price":"€","season":"Estate","desc":"Tre salti d'acqua tra i più fotografati delle Alpi, raggiungibili con facile sentiero.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"cascate-di-lillaz"},{"destination":"cogne","title":"Prati di Sant'Orso - Valnontey","type":"Escursioni","area":"Valnontey","price":"€","season":"Estate","desc":"Sentiero facile nel Gran Paradiso con possibilità di avvistare stambecchi e camosci.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"prati-di-sant-orso-valnontey"},{"destination":"cogne","title":"Trekking del Gran Paradiso","type":"Escursioni","area":"Valnontey","price":"€","season":"Estate","desc":"Trekking a tappe nel parco nazionale con rifugi, ghiacciai e fauna alpina.","website":"https://www.pngp.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"trekking-del-gran-paradiso"},{"destination":"cogne","title":"Rifugio Vittorio Sella","type":"Escursioni","area":"Valnontey","price":"€","season":"Estate","desc":"Escursione classica al rifugio storico con vista sul ghiacciaio del Gran Paradiso.","website":"https://www.pngp.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"rifugio-vittorio-sella"},{"destination":"cogne","title":"Giardino Botanico Paradisia","type":"Attività","area":"Valnontey","price":"€","season":"Estate","desc":"Giardino alpino con oltre 1.000 specie di piante nel cuore del Gran Paradiso.","website":"https://www.pngp.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"giardino-botanico-paradisia"},{"destination":"cogne","title":"Lago di Loie","type":"Escursioni","area":"Valnontey","price":"€","season":"Estate","desc":"Escursione impegnativa verso un lago alpino incastonato tra le rocce del Gran Paradiso.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-di-loie"},{"destination":"cogne","title":"Miniere di Cogne","type":"Attività","area":"Cogne","price":"€€","season":"Entrambi","desc":"Visite guidate alle antiche miniere di magnetite: storia industriale alpina.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"miniere-di-cogne"},{"destination":"cogne","title":"Sci di Fondo Cogne","type":"Impianti sciistici","area":"Prato Sant'Orso","price":"€€","season":"Inverno","desc":"80 km di piste da fondo tra le migliori d'Europa, sede di Coppa del Mondo.","website":"https://www.cogneturismo.it","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"sci-di-fondo-cogne"},{"destination":"cogne","title":"Pista Gran Paradiso","type":"Impianti sciistici","area":"Cogne","price":"€€","season":"Inverno","desc":"Piccola area di sci alpino ideale per famiglie e principianti.","website":"","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"pista-gran-paradiso"},{"destination":"cogne","title":"Lou Ressignon","type":"Ristoranti","area":"Centro paese","price":"€€","season":"Entrambi","desc":"Trattoria autentica: fonduta, carbonade, polenta concia e dolci valdostani.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"lou-ressignon"},{"destination":"cogne","title":"Ristorante del Bellevue","type":"Ristoranti","area":"Hotel Bellevue","price":"€€€€","season":"Entrambi","desc":"Cucina gourmet con prodotti del territorio e menù degustazione raffinati.","website":"https://www.hotelbellevue.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"ristorante-del-bellevue"},{"destination":"cogne","title":"Bar à Fromage","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Bistrot dedicato ai formaggi valdostani: fonduta, raclette e taglieri.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"bar-a-fromage"},{"destination":"cogne","title":"Brasserie du Bon Bec","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Locale informale con cucina veloce, birre artigianali e atmosfera giovane.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"brasserie-du-bon-bec"},{"destination":"cogne","title":"Ciaspolate nel Gran Paradiso","type":"Escursioni","area":"Valnontey","price":"€€","season":"Inverno","desc":"Escursioni con le racchette da neve nei boschi innevati del parco nazionale.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"ciaspolate-nel-gran-paradiso"},{"destination":"cogne","title":"Pattinaggio Cogne","type":"Attività","area":"Centro","price":"€","season":"Inverno","desc":"Pista di pattinaggio su ghiaccio all'aperto nel centro del paese.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"pattinaggio-cogne"},{"destination":"cogne","title":"Pasticceria Perret","type":"Bar","area":"Centro","price":"€","season":"Entrambi","desc":"Pasticceria storica con dolci valdostani: tegole, torcetti e mecoulin.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"pasticceria-perret"},{"destination":"pila","title":"Hotel La Chance","type":"Hotel","area":"Pila","price":"€€€","season":"Entrambi","desc":"Hotel ski-in/ski-out con vista panoramica sulle Alpi e ristorante.","website":"https://hotellachancepila.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-la-chance","premium":true},{"destination":"pila","title":"Hotel Lion Noir","type":"Hotel","area":"Pila","price":"€€€","season":"Entrambi","desc":"Hotel moderno con centro wellness e accesso diretto alle piste.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-lion-noir"},{"destination":"pila","title":"Pila Ski Resort","type":"Impianti sciistici","area":"Pila","price":"€€€","season":"Inverno","desc":"70 km di piste con telecabina da Aosta: sci e visita della città nello stesso giorno.","website":"https://www.pila.it","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"pila-ski-resort","premium":true},{"destination":"pila","title":"Pila Bike Park","type":"Attività","area":"Pila","price":"€€","season":"Estate","desc":"Bike park estivo con tracciati DH, enduro e trail serviti dagli impianti.","website":"https://www.pila.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"pila-bike-park"},{"destination":"pila","title":"Sentiero Panoramico Pila-Chamolé","type":"Escursioni","area":"Pila","price":"€","season":"Estate","desc":"Facile passeggiata panoramica con vista su Aosta e le cime circostanti.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"sentiero-panoramico-pila-chamole"},{"destination":"pila","title":"Lago Chamolé","type":"Escursioni","area":"Sopra Pila","price":"€","season":"Estate","desc":"Escursione al lago alpino con possibilità di avvistare marmotte.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-chamole"},{"destination":"pila","title":"Yeti Pila","type":"Ristoranti","area":"Pila","price":"€€","season":"Entrambi","desc":"Ristorante sulla neve con terrazza panoramica e cucina di montagna.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"yeti-pila"},{"destination":"pila","title":"Bar des Guides","type":"Bar","area":"Pila","price":"€€","season":"Inverno","desc":"Après-ski animato con musica e cocktail nel cuore della stazione.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-des-guides"},{"destination":"pila","title":"Telecabina Aosta-Pila","type":"Attività","area":"Aosta/Pila","price":"€€","season":"Entrambi","desc":"Collegamento diretto dal centro di Aosta a 1.800 m in soli 20 minuti.","website":"https://www.pila.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"telecabina-aosta-pila"},{"destination":"pila","title":"Parco Avventura Pila","type":"Attività","area":"Pila","price":"€€","season":"Estate","desc":"Percorsi acrobatici tra gli alberi per bambini e adulti in quota.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"parco-avventura-pila"},{"destination":"aosta","title":"Omama Hotel","type":"Hotel","area":"Vicino centro storico","price":"€€€","season":"Entrambi","desc":"Hotel contemporaneo con design e centro wellness, base ideale per la Valle.","website":"https://www.omamahotel.com","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"omama-hotel","premium":true},{"destination":"aosta","title":"HB Aosta Hotel","type":"Hotel","area":"Centro","price":"€€","season":"Entrambi","desc":"Hotel boutique moderno con ottimo rapporto qualità-prezzo.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hb-aosta-hotel"},{"destination":"aosta","title":"Hotel Milleluci","type":"Hotel","area":"Collina di Aosta","price":"€€€€","season":"Entrambi","desc":"Hotel panoramico con spa e vista spettacolare sulla conca di Aosta.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-milleluci","premium":true},{"destination":"aosta","title":"Duca d'Aosta Modern Retro Hotel","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel di design nel centro storico con stile retro-contemporaneo.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"duca-d-aosta-modern-retro-hotel"},{"destination":"aosta","title":"Norden Palace Hotel","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel elegante con piscina e terrazza panoramica sulla città.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"norden-palace-hotel"},{"destination":"aosta","title":"Teatro Romano","type":"Attività","area":"Centro storico","price":"€€","season":"Entrambi","desc":"Imponente teatro del I secolo a.C. con facciata alta 22 metri, tra i meglio conservati.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"teatro-romano"},{"destination":"aosta","title":"Arco di Augusto","type":"Attività","area":"Centro storico","price":"€","season":"Entrambi","desc":"Arco trionfale romano del 25 a.C., simbolo della fondazione di Augusta Praetoria.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"arco-di-augusto"},{"destination":"aosta","title":"Porta Praetoria","type":"Attività","area":"Centro storico","price":"€","season":"Entrambi","desc":"Porta d'ingresso romana a doppio fornice, perfettamente conservata.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"porta-praetoria"},{"destination":"aosta","title":"Criptoportico Forense","type":"Attività","area":"Centro storico","price":"€€","season":"Entrambi","desc":"Galleria sotterranea romana del I secolo a.C. sotto il centro di Aosta.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"criptoportico-forense"},{"destination":"aosta","title":"Cattedrale di Aosta","type":"Attività","area":"Centro storico","price":"€","season":"Entrambi","desc":"Cattedrale con mosaici medievali, coro ligneo e museo del tesoro.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"cattedrale-di-aosta"},{"destination":"aosta","title":"Collegiata di Sant'Orso","type":"Attività","area":"Centro storico","price":"€","season":"Entrambi","desc":"Complesso romanico con chiostro istoriato e affreschi ottoniani.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"collegiata-di-sant-orso"},{"destination":"aosta","title":"MAR - Museo Archeologico","type":"Attività","area":"Centro storico","price":"€€","season":"Entrambi","desc":"Museo con reperti dalla preistoria all'età romana di Augusta Praetoria.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"mar-museo-archeologico"},{"destination":"aosta","title":"Paolo Griffa al Caffè Nazionale","type":"Ristoranti","area":"Piazza Chanoux","price":"€€€€","season":"Entrambi","desc":"Il miglior ristorante della Valle: cucina creativa d'autore, 2 forchette Gambero Rosso.","website":"https://www.cafenational.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"paolo-griffa-al-caffe-nazionale"},{"destination":"aosta","title":"Vecchio Ristoro","type":"Ristoranti","area":"Centro storico","price":"€€€€","season":"Entrambi","desc":"Cucina di montagna raffinata in antico mulino: menù degustazione à la minute.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"vecchio-ristoro"},{"destination":"aosta","title":"Gina Casa con Cucina","type":"Ristoranti","area":"Via Croce di Città","price":"€€€","season":"Entrambi","desc":"Cucina creativa tra Occidente e Oriente: new entry Gambero Rosso 2025.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"gina-casa-con-cucina"},{"destination":"aosta","title":"La Grenette","type":"Ristoranti","area":"Piazza Chanoux","price":"€€€","season":"Entrambi","desc":"Brasserie elegante sulla piazza principale con piatti valdostani e atmosfera vivace.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"la-grenette"},{"destination":"aosta","title":"La Clusaz","type":"Ristoranti","area":"Gignod (vicino)","price":"€€€€","season":"Entrambi","desc":"Cucina d'autore a Gignod, 2 forchette Gambero Rosso: percorsi degustazione raffinati.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"la-clusaz"},{"destination":"aosta","title":"Osteria Nando","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Trattoria storica con piatti valdostani genuini e porzioni generose.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"osteria-nando"},{"destination":"aosta","title":"Bataclan","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Locale vivace per aperitivi e serate con cocktail e taglieri valdostani.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bataclan"},{"destination":"aosta","title":"Old Distillery Pub","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Pub storico con ampia selezione di birre artigianali e atmosfera informale.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"old-distillery-pub"},{"destination":"aosta","title":"Fiera di Sant'Orso","type":"Attività","area":"Centro storico","price":"€","season":"Inverno","desc":"Millenaria fiera dell'artigianato tradizionale valdostano, 30-31 gennaio.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"fiera-di-sant-orso"},{"destination":"aosta","title":"Mercato coperto","type":"Attività","area":"Centro","price":"€","season":"Entrambi","desc":"Mercato con prodotti tipici valdostani: fontina, lardo, miele e vini locali.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"mercato-coperto"},{"destination":"aosta","title":"Castello di Fénis","type":"Attività","area":"Fénis (vicino)","price":"€€","season":"Entrambi","desc":"Il castello medievale più celebre della Valle: affreschi quattrocenteschi e doppia cinta muraria.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-fenis"},{"destination":"aosta","title":"Castello di Issogne","type":"Attività","area":"Issogne (vicino)","price":"€€","season":"Entrambi","desc":"Dimora signorile del XV secolo con cortile affrescato e fontana del melograno.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-issogne"},{"destination":"aosta","title":"Castello Reale di Sarre","type":"Attività","area":"Sarre (vicino)","price":"€€","season":"Entrambi","desc":"Residenza estiva dei Savoia con galleria dei trofei venatori e Appartamento Reale.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-reale-di-sarre"},{"destination":"champoluc","title":"CampZero Active & Luxury Resort","type":"Hotel","area":"Champoluc","price":"€€€€","season":"Entrambi","desc":"Resort contemporaneo per sport, benessere e soggiorni active luxury.","website":"https://www.campzeroresort.com","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"campzero-active-luxury-resort","premium":true},{"destination":"champoluc","title":"Hotellerie de Mascognaz","type":"Hotel","area":"Mascognaz","price":"€€€€","season":"Entrambi","desc":"Borgo alpino trasformato in relais esclusivo con spa e ristorante.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotellerie-de-mascognaz","premium":true},{"destination":"champoluc","title":"Hotel de Champoluc","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel tradizionale con ristorante, centro wellness e posizione centrale.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-de-champoluc"},{"destination":"champoluc","title":"Monterosa Ski Champoluc","type":"Impianti sciistici","area":"Champoluc / Crest","price":"€€€€","season":"Inverno","desc":"Accesso al comprensorio del Monte Rosa: piste lunghe e panoramiche.","website":"https://monterosaski.eu","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"monterosa-ski-champoluc"},{"destination":"champoluc","title":"Lago di Estoul","type":"Escursioni","area":"Brusson / Estoul","price":"€","season":"Estate","desc":"Escursione facile verso un lago alpino incastonato tra pascoli e larici.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-di-estoul"},{"destination":"champoluc","title":"Col di Nana","type":"Escursioni","area":"Champoluc","price":"€","season":"Estate","desc":"Escursione panoramica con vista sul Monte Rosa e le valli circostanti.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"col-di-nana"},{"destination":"champoluc","title":"Villaggi Walser","type":"Attività","area":"Val d'Ayas","price":"€","season":"Entrambi","desc":"Visita ai villaggi walser con architettura tradizionale in legno e pietra.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"villaggi-walser"},{"destination":"champoluc","title":"Atelier Gourmand","type":"Ristoranti","area":"Champoluc","price":"€€€","season":"Entrambi","desc":"Ristorante di cucina creativa con prodotti locali e atmosfera raffinata.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"atelier-gourmand"},{"destination":"champoluc","title":"Le Sapin","type":"Ristoranti","area":"Champoluc","price":"€€","season":"Entrambi","desc":"Trattoria con cucina valdostana casalinga e fonduta al tartufo.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"le-sapin"},{"destination":"champoluc","title":"Freeride Monte Rosa","type":"Attività","area":"Champoluc","price":"€€€","season":"Inverno","desc":"Fuoripista guidato sui pendii del Monte Rosa con guide alpine.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"freeride-monte-rosa"},{"destination":"champoluc","title":"Bar du Centre","type":"Bar","area":"Champoluc","price":"€€","season":"Entrambi","desc":"Bar nel centro del paese per après-ski e aperitivi serali.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-du-centre"},{"destination":"champoluc","title":"Terme di Champoluc","type":"Attività","area":"Champoluc","price":"€€€","season":"Entrambi","desc":"Centro benessere con piscine termali e trattamenti rilassanti.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"terme-di-champoluc"},{"destination":"saint-vincent","title":"Grand Hôtel Billia","type":"Hotel","area":"Saint-Vincent","price":"€€€€","season":"Entrambi","desc":"Storico hotel 5 stelle collegato al Casinò con spa e ristorante.","website":"https://www.billia.it","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"grand-hotel-billia","premium":true},{"destination":"saint-vincent","title":"Hotel Diana","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel con spa e giardino, posizione tranquilla nel centro di Saint-Vincent.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-diana","premium":true},{"destination":"saint-vincent","title":"Hotel Parc et Lac","type":"Hotel","area":"Centro","price":"€€","season":"Entrambi","desc":"Hotel familiare con buon rapporto qualità-prezzo e ristorante.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-parc-et-lac"},{"destination":"saint-vincent","title":"Casino de la Vallée","type":"Attività","area":"Via Italo Mus","price":"€€€","season":"Entrambi","desc":"Uno dei casinò più grandi d'Europa: sale da gioco, ristoranti ed eventi.","website":"https://www.casinodelavallee.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"casino-de-la-vallee"},{"destination":"saint-vincent","title":"Terme di Saint-Vincent","type":"Attività","area":"Saint-Vincent","price":"€€€","season":"Entrambi","desc":"Centro termale con acque minerali, trattamenti e percorsi benessere.","website":"https://www.termedisaintvincent.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"terme-di-saint-vincent"},{"destination":"saint-vincent","title":"Le Vigneron","type":"Ristoranti","area":"Arvier (vicino)","price":"€€€","season":"Entrambi","desc":"Miglior rapporto qualità-prezzo della Valle secondo Gambero Rosso 2025.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"le-vigneron"},{"destination":"saint-vincent","title":"Le Grenier","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Ristorante in ambiente caratteristico con cucina tradizionale valdostana.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"le-grenier"},{"destination":"saint-vincent","title":"Caffè Nazionale","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Caffè storico nel centro di Saint-Vincent per colazioni e aperitivi.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"caffe-nazionale"},{"destination":"saint-vincent","title":"Passeggiata lungo la Dora","type":"Escursioni","area":"Saint-Vincent","price":"€","season":"Entrambi","desc":"Percorso pedonale lungo il fiume Dora Baltea tra verde e scorci alpini.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"passeggiata-lungo-la-dora"},{"destination":"saint-vincent","title":"Castello di Ussel","type":"Attività","area":"Châtillon (vicino)","price":"€€","season":"Entrambi","desc":"Castello monoblocco trecentesco donato dal barone Bich, sede di mostre.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-ussel"},{"destination":"saint-vincent","title":"Castello di Fénis","type":"Attività","area":"Fénis (vicino)","price":"€€","season":"Entrambi","desc":"Il più celebre castello medievale della Valle: affreschi e doppia cinta muraria.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-fenis"},{"destination":"saint-vincent","title":"Enoteca regionale","type":"Attività","area":"Centro","price":"€€","season":"Entrambi","desc":"Degustazione dei vini valdostani DOC: Torrette, Fumin, Petit Rouge e Blanc de Morgex.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"enoteca-regionale"},{"destination":"pre-saint-didier","title":"QC Terme Pré-Saint-Didier","type":"Attività","area":"Palleusieux","price":"€€€","season":"Entrambi","desc":"Centro termale storico dal 1838: 40+ pratiche, piscine esterne con vista Monte Bianco.","website":"https://www.qcterme.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"qc-terme-pre-saint-didier","premium":true},{"destination":"pre-saint-didier","title":"QC Termemontebianco Hotel","type":"Hotel","area":"Palleusieux","price":"€€€€","season":"Entrambi","desc":"Resort spa con accesso diretto alle terme, vista Monte Bianco e cucina locale.","website":"https://www.qcterme.com","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"qc-termemontebianco-hotel","premium":true},{"destination":"pre-saint-didier","title":"Hotel Courmaison","type":"Hotel","area":"Centro","price":"€€€","season":"Entrambi","desc":"Hotel con centro benessere, piscina e ristorante con prodotti locali.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-courmaison"},{"destination":"pre-saint-didier","title":"Orrido di Pré-Saint-Didier","type":"Escursioni","area":"Centro paese","price":"€","season":"Entrambi","desc":"Gola spettacolare con passerella panoramica sopra la cascata della Dora di Verney.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"orrido-di-pre-saint-didier"},{"destination":"pre-saint-didier","title":"Sentiero della Dora","type":"Escursioni","area":"Pré-Saint-Didier","price":"€","season":"Estate","desc":"Passeggiata lungo il torrente tra boschi e scorci sul Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"sentiero-della-dora"},{"destination":"pre-saint-didier","title":"Fernandell","type":"Ristoranti","area":"Centro","price":"€€€","season":"Entrambi","desc":"Brasserie vivace: raclette, fonduta e piatti da condividere in allegria.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"fernandell"},{"destination":"pre-saint-didier","title":"Voilà Gastronomia","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Gastronomia gourmet con polenta, crêpes, pinse e prodotti locali.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"voila-gastronomia"},{"destination":"pre-saint-didier","title":"Lo Riondet","type":"Bar","area":"Centro","price":"€€","season":"Entrambi","desc":"Bar del centro per colazione, aperitivo e dopo-terme con terrazza.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"lo-riondet"},{"destination":"pre-saint-didier","title":"Parco Avventura Mont Blanc","type":"Attività","area":"Pré-Saint-Didier","price":"€€","season":"Estate","desc":"Percorsi acrobatici tra gli alberi con vista sulle montagne.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"parco-avventura-mont-blanc"},{"destination":"pre-saint-didier","title":"Parapendio Mont Blanc","type":"Attività","area":"Pré-Saint-Didier","price":"€€€","season":"Estate","desc":"Voli in tandem con pilota esperto: sorvolare la Valdigne e il Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"parapendio-mont-blanc"},{"destination":"gressoney","title":"Castel Savoia","type":"Attività","area":"Gressoney-Saint-Jean","price":"€€","season":"Entrambi","desc":"Fiabesco castello della Regina Margherita circondato da giardini botanici.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castel-savoia","premium":true},{"destination":"gressoney","title":"Hotel Nordend","type":"Hotel","area":"Gressoney-La-Trinité","price":"€€€","season":"Entrambi","desc":"Hotel tradizionale in stile walser con ristorante e atmosfera autentica.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-nordend","premium":true},{"destination":"gressoney","title":"Residence Castlerose","type":"Hotel","area":"Gressoney-Saint-Jean","price":"€€","season":"Entrambi","desc":"Residence con appartamenti, piscina e giardino vicino a Castel Savoia.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"residence-castlerose"},{"destination":"gressoney","title":"Monterosa Ski Gressoney","type":"Impianti sciistici","area":"Gressoney-La-Trinité","price":"€€€€","season":"Inverno","desc":"Comprensorio collegato a Champoluc e Alagna con piste panoramiche.","website":"https://monterosaski.eu","image":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80","slug":"monterosa-ski-gressoney"},{"destination":"gressoney","title":"Sentiero dei Walser","type":"Escursioni","area":"Gressoney","price":"€","season":"Estate","desc":"Percorso culturale attraverso i villaggi walser con architettura tradizionale.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"sentiero-dei-walser"},{"destination":"gressoney","title":"Lago Gabiet","type":"Escursioni","area":"Gressoney-La-Trinité","price":"€","season":"Estate","desc":"Escursione in quota al lago alpino con panorama sul Monte Rosa.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-gabiet"},{"destination":"gressoney","title":"Punta Indren","type":"Escursioni","area":"Gressoney-La-Trinité","price":"€€","season":"Estate","desc":"Funivia fino a 3.275 m per trekking glaciale e panorami sul Monte Rosa.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"punta-indren"},{"destination":"gressoney","title":"Museo Walser","type":"Attività","area":"Gressoney-Saint-Jean","price":"€","season":"Entrambi","desc":"Museo della cultura walser: tradizioni, costumi e vita nella Valle del Lys.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"museo-walser"},{"destination":"gressoney","title":"Ristorante Lyshorn","type":"Ristoranti","area":"Gressoney-Saint-Jean","price":"€€€","season":"Entrambi","desc":"Cucina valdostana in ambiente walser: fonduta, polenta e selvaggina.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"ristorante-lyshorn"},{"destination":"gressoney","title":"Lo Stambecco","type":"Ristoranti","area":"Gressoney-La-Trinité","price":"€€","season":"Entrambi","desc":"Trattoria informale con piatti di montagna e birre artigianali.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"lo-stambecco"},{"destination":"gressoney","title":"Sci Alpinismo Monte Rosa","type":"Attività","area":"Gressoney","price":"€€€","season":"Inverno","desc":"Itinerari di scialpinismo guidato sui versanti del Monte Rosa.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"sci-alpinismo-monte-rosa"},{"destination":"gressoney","title":"Ecomuseo Walser","type":"Attività","area":"Gressoney-Saint-Jean","price":"€","season":"Entrambi","desc":"Percorso all'aperto tra case walser, mulini e forni tradizionali.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"ecomuseo-walser"},{"destination":"bard","title":"Forte di Bard","type":"Attività","area":"Bard","price":"€€","season":"Entrambi","desc":"Fortezza sabauda restaurata: Museo delle Alpi, mostre d'arte e ascensori panoramici.","website":"https://www.fortedibard.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"forte-di-bard","premium":true},{"destination":"bard","title":"Museo delle Alpi","type":"Attività","area":"Forte di Bard","price":"€€","season":"Entrambi","desc":"Museo multimediale che racconta storia, natura e cultura dell'arco alpino.","website":"https://www.fortedibard.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"museo-delle-alpi","premium":true},{"destination":"bard","title":"Borgo di Bard","type":"Attività","area":"Bard","price":"€","season":"Entrambi","desc":"Pittoresco borgo medievale con case in pietra ai piedi del Forte.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"borgo-di-bard"},{"destination":"bard","title":"Hotel ad Gallias","type":"Hotel","area":"Bard","price":"€€€","season":"Entrambi","desc":"Hotel ricavato in edificio storico nel borgo di Bard con vista sul Forte.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-ad-gallias"},{"destination":"bard","title":"Le Alpi del Forte","type":"Ristoranti","area":"Forte di Bard","price":"€€€","season":"Entrambi","desc":"Ristorante all'interno del Forte con cucina valdostana e vista panoramica.","website":"https://www.fortedibard.it","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"le-alpi-del-forte"},{"destination":"bard","title":"Via Francigena VdA","type":"Escursioni","area":"Bard","price":"€","season":"Estate","desc":"Tappa valdostana della Via Francigena: dal fondovalle al Colle del Gran San Bernardo.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"via-francigena-vda"},{"destination":"bard","title":"Parco Naturale Mont Avic","type":"Escursioni","area":"Champdepraz (vicino)","price":"€","season":"Estate","desc":"Parco naturale con laghi alpini, foreste e sentieri poco frequentati.","website":"https://www.montavic.it","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"parco-naturale-mont-avic"},{"destination":"bard","title":"Caffè del Borgo","type":"Bar","area":"Bard","price":"€","season":"Entrambi","desc":"Piccolo caffè nel borgo storico per una pausa dopo la visita al Forte.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"caffe-del-borgo"},{"destination":"morgex","title":"Café Quinson","type":"Ristoranti","area":"Morgex","price":"€€€€","season":"Entrambi","desc":"Cucina d'autore dello chef Buillas: menu Promenade a sorpresa, 2 forchette Gambero Rosso.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"cafe-quinson","premium":true},{"destination":"morgex","title":"Cave Mont Blanc","type":"Attività","area":"Morgex","price":"€€","season":"Entrambi","desc":"Cantina cooperativa per degustare il Blanc de Morgex, vino bianco d'alta quota unico al mondo.","website":"https://www.cavemontblanc.com","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"cave-mont-blanc","premium":true},{"destination":"morgex","title":"Torre Malluquin","type":"Attività","area":"Morgex","price":"€","season":"Entrambi","desc":"Torre medievale nel centro storico del borgo, testimonianza della storia valdostana.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"torre-malluquin"},{"destination":"morgex","title":"Sentiero del Vino","type":"Escursioni","area":"Morgex","price":"€","season":"Estate","desc":"Passeggiata tra i vigneti più alti d'Europa con vista sul Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"sentiero-del-vino"},{"destination":"morgex","title":"Derby du Gouffre","type":"Attività","area":"Morgex","price":"€","season":"Inverno","desc":"Storica gara di sci di fondo tra Morgex e Arvier lungo la Dora Baltea.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"derby-du-gouffre"},{"destination":"morgex","title":"Hotel Valdigne","type":"Hotel","area":"Morgex","price":"€€","season":"Entrambi","desc":"Hotel semplice e accogliente nel centro di Morgex con ristorante.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-valdigne"},{"destination":"morgex","title":"La Maison de Filippo","type":"Ristoranti","area":"Entrèves (vicino)","price":"€€€","season":"Entrambi","desc":"Ristorante storico con menu fisso di 36 portate di cucina valdostana tradizionale.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"la-maison-de-filippo"},{"destination":"morgex","title":"Bar de la Poste","type":"Bar","area":"Morgex","price":"€","season":"Entrambi","desc":"Bar del paese con terrazza soleggiata e prodotti da forno artigianali.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-de-la-poste"},{"destination":"courmayeur","title":"Rifugio Bonatti","type":"Escursioni","area":"Val Ferret","price":"€","season":"Estate","desc":"Rifugio iconico a 2.025 m con terrazza panoramica sul Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"rifugio-bonatti"},{"destination":"courmayeur","title":"Rifugio Bertone","type":"Escursioni","area":"Sopra Courmayeur","price":"€","season":"Estate","desc":"Rifugio a 1.989 m punto di partenza per il Tour del Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"rifugio-bertone"},{"destination":"courmayeur","title":"Lago del Miage","type":"Escursioni","area":"Val Veny","price":"€","season":"Estate","desc":"Lago glaciale ai margini del ghiacciaio del Miage, accessibile con sentiero facile.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"lago-del-miage"},{"destination":"courmayeur","title":"Equinox Lounge Bar","type":"Cocktail bar","area":"Centro","price":"€€€","season":"Entrambi","desc":"Lounge bar raffinato con cocktail d'autore e atmosfera sofisticata.","website":"","image":"https://images.unsplash.com/photo-1527761939622-933c470e8a2b?auto=format&fit=crop&w=1200&q=80","slug":"equinox-lounge-bar"},{"destination":"courmayeur","title":"Altitude Champagne & Gourmet","type":"Ristoranti","area":"Skyway","price":"€€€€","season":"Entrambi","desc":"Ristorante in quota alla stazione della Skyway con champagne e piatti gourmet.","website":"https://www.montebianco.com","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"altitude-champagne-gourmet"},{"destination":"cervinia","title":"Hotel Europa","type":"Hotel","area":"Centro","price":"€€","season":"Entrambi","desc":"Hotel storico con buon rapporto qualità-prezzo, posizione centrale.","website":"","image":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80","slug":"hotel-europa"},{"destination":"cervinia","title":"Refuge Théodule","type":"Escursioni","area":"Plateau Rosa","price":"€€","season":"Estate","desc":"Rifugio storico al confine italo-svizzero a 3.317 m con vista sul Cervino.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"refuge-theodule"},{"destination":"cervinia","title":"Le Bistrot","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Bistrot informale con piatti veloci, taglieri e birre artigianali.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"le-bistrot"},{"destination":"aosta","title":"Castello di Aymavilles","type":"Attività","area":"Aymavilles (vicino)","price":"€€","season":"Entrambi","desc":"Castello con quattro torri cilindriche, ospita la collezione dell'Académie Saint-Anselme.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-aymavilles"},{"destination":"aosta","title":"Castello Sarriod de la Tour","type":"Attività","area":"Saint-Pierre (vicino)","price":"€€","season":"Entrambi","desc":"Castello medievale tra i frutteti con soffitto dei Goliardi e affreschi unici.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-sarriod-de-la-tour"},{"destination":"aosta","title":"Castello di Saint-Pierre","type":"Attività","area":"Saint-Pierre (vicino)","price":"€€","season":"Entrambi","desc":"Castello fiabesco con quattro torrette: ospita il Museo di Scienze Naturali.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-saint-pierre"},{"destination":"aosta","title":"Castello di Introd","type":"Attività","area":"Introd (vicino)","price":"€€","season":"Entrambi","desc":"Castello poligonale con granaio e Les Maisons de Cogne: architettura rurale alpina.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-introd"},{"destination":"aosta","title":"Pizzeria Anni's","type":"Ristoranti","area":"Centro","price":"€€","season":"Entrambi","desc":"Pizzeria apprezzata con forno a legna e impasti con farine locali.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"pizzeria-anni-s"},{"destination":"aosta","title":"Gelateria Streghe","type":"Bar","area":"Centro","price":"€","season":"Entrambi","desc":"Gelateria artigianale nel centro storico con gusti creativi e locali.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"gelateria-streghe"},{"destination":"pila","title":"Escursione Couis-Chamolé","type":"Escursioni","area":"Pila","price":"€","season":"Estate","desc":"Anello panoramico con vista sulla Valle centrale e sul Gran Paradiso.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"escursione-couis-chamole"},{"destination":"gressoney","title":"Funivia del Gabiet","type":"Attività","area":"Gressoney-La-Trinité","price":"€€","season":"Entrambi","desc":"Funivia panoramica che sale fino al Lago Gabiet a 2.340 m.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"funivia-del-gabiet"},{"destination":"saint-vincent","title":"Bar Nuovo Cinema","type":"Bar","area":"Centro","price":"€","season":"Entrambi","desc":"Bar con terrazza per aperitivi e dolci artigianali nel centro.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"bar-nuovo-cinema"},{"destination":"saint-vincent","title":"Castello di Verrès","type":"Attività","area":"Verrès (vicino)","price":"€€","season":"Entrambi","desc":"Imponente castello monoblocco trecentesco: architettura militare perfetta.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-verres"},{"destination":"pre-saint-didier","title":"Pasticceria Ugetti","type":"Bar","area":"Centro","price":"€","season":"Entrambi","desc":"Pasticceria artigianale con specialità valdostane e dolci di montagna.","website":"","image":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80","slug":"pasticceria-ugetti"},{"destination":"la-thuile","title":"Sci Alpinismo Rutor","type":"Attività","area":"La Thuile","price":"€€€","season":"Inverno","desc":"Itinerari di scialpinismo guidato verso il ghiacciaio del Rutor.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"sci-alpinismo-rutor"},{"destination":"la-thuile","title":"Rifugio Deffeyes","type":"Escursioni","area":"La Thuile","price":"€","season":"Estate","desc":"Rifugio a 2.494 m ai piedi del ghiacciaio del Rutor con vista sul Monte Bianco.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"rifugio-deffeyes"},{"destination":"champoluc","title":"Antagnod","type":"Attività","area":"Val d'Ayas","price":"€","season":"Entrambi","desc":"Borgo storico con chiesa, artigianato locale e atmosfera walser autentica.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"antagnod"},{"destination":"bard","title":"Castello di Verrès","type":"Attività","area":"Verrès (vicino)","price":"€€","season":"Entrambi","desc":"Castello monoblocco inespugnabile del XIV secolo: scalone ad archi unico.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-verres"},{"destination":"bard","title":"Castello di Issogne","type":"Attività","area":"Issogne (vicino)","price":"€€","season":"Entrambi","desc":"Elegante dimora quattrocentesca con fontana del melograno e lunette affrescate.","website":"https://www.lovevda.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"castello-di-issogne"},{"destination":"morgex","title":"Alpeggio e Formaggi","type":"Attività","area":"Morgex","price":"€","season":"Estate","desc":"Visite agli alpeggi con degustazione di fontina DOP e formaggi di montagna.","website":"","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"alpeggio-e-formaggi"},{"destination":"morgex","title":"Pizzeria La Grange","type":"Ristoranti","area":"Morgex","price":"€€","season":"Entrambi","desc":"Pizzeria in ambiente rustico con forno a legna e ingredienti locali.","website":"","image":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80","slug":"pizzeria-la-grange"},{"destination":"cogne","title":"Centro Visitatori Gran Paradiso","type":"Attività","area":"Cogne","price":"€","season":"Entrambi","desc":"Centro informativo del parco con mostre sulla fauna alpina e i ghiacciai.","website":"https://www.pngp.it","image":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80","slug":"centro-visitatori-gran-paradiso"},{"destination":"cogne","title":"Cascata di Cogne - Urtier","type":"Escursioni","area":"Cogne","price":"€","season":"Estate","desc":"Cascata lungo il torrente Urtier raggiungibile con breve sentiero.","website":"","image":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80","slug":"cascata-di-cogne-urtier"},{slug:"maison-du-lard",title:"Maison du Lard",destination:"aosta",type:"Gastronomia / Asporto",area:"Centro storico",price:"€€",season:"Entrambi",desc:"Bottega storica del lardo d'Arnad e salumi valdostani DOP. Prodotti tipici da portare a casa.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"fromadzo-shop",title:"Fromadzo Shop",destination:"aosta",type:"Gastronomia / Asporto",area:"Centro storico",price:"€€",season:"Entrambi",desc:"Negozio specializzato in Fontina DOP, Fromadzo e formaggi d'alpeggio valdostani selezionati.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"boulangerie-alpine-courmayeur",title:"Boulangerie Alpine",destination:"courmayeur",type:"Gastronomia / Asporto",area:"Via Roma",price:"€",season:"Entrambi",desc:"Pane di segale, torcetti e dolci tradizionali valdostani sfornati ogni mattina. Da non perdere la michetta.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"drogheria-cervinia",title:"Drogheria di Cervinia",destination:"cervinia",type:"Gastronomia / Asporto",area:"Centro paese",price:"€€",season:"Entrambi",desc:"Selezione di prodotti locali, vini valdostani, miele di montagna e conserve artigianali.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"enoteca-saint-vincent",title:"Enoteca Valdostana",destination:"saint-vincent",type:"Gastronomia / Asporto",area:"Centro",price:"€€",season:"Entrambi",desc:"Vini DOC della Valle d'Aosta, grappa di montagna e liquori tipici. Degustazioni su prenotazione.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"macelleria-cogne",title:"Macelleria Alpina di Cogne",destination:"cogne",type:"Gastronomia / Asporto",area:"Piazza Chanoux",price:"€€",season:"Entrambi",desc:"Mocetta di camoscio, boudin valdostano e carne salada prodotti artigianalmente. Prodotti tipici del Gran Paradiso.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"panetteria-la-thuile",title:"Panificio La Thuile",destination:"la-thuile",type:"Gastronomia / Asporto",area:"Centro paese",price:"€",season:"Entrambi",desc:"Pane nero di segale, tegole valdostane e biscotti alle noci. Colazione alpina autentica ogni mattina.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"},{slug:"salumeria-gressoney",title:"Salumeria del Lys",destination:"gressoney",type:"Gastronomia / Asporto",area:"Centro",price:"€€",season:"Entrambi",desc:"Specialità walser e valdostane: lardo, salami di montagna, formaggi d'alpeggio e marmellate artigianali.",website:"",image:"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80"}]};
+const IS_ADMIN=(new URLSearchParams(location.search).get("key")==="guidami2025");
+document.addEventListener("DOMContentLoaded",()=>{const t=document.getElementById("adminTools");if(t&&IS_ADMIN)t.style.display="flex";});
+const CATS=["Tutti","Hotel","Ristoranti","Bar","Cocktail bar","Gastronomia / Asporto","Escursioni","Attivit\u00e0","Impianti sciistici"];
+const PRICES=["Tutte","\u20ac","\u20ac\u20ac","\u20ac\u20ac\u20ac","\u20ac\u20ac\u20ac\u20ac"];
+const SEASONS=["Entrambi","Inverno","Estate"];
+const TE={"Hotel":"\ud83d\udecf\ufe0f","Ristoranti":"\ud83c\udf7d\ufe0f","Bar":"\u2615","Cocktail bar":"\ud83c\udf78","Gastronomia / Asporto":"\ud83e\uddc0","Escursioni":"\ud83e\udd7e","Attivit\u00e0":"\ud83d\ude80","Impianti sciistici":"\u26f7\ufe0f"};
+const LE={"sci":{e:"\u26f7\ufe0f",l:"Sci"},"escursioni":{e:"\ud83e\udd7e",l:"Escursioni"},"paese":{e:"\ud83c\udfd8\ufe0f",l:"Paese"},"citta":{e:"\ud83c\udfdb\ufe0f",l:"Citt\u00e0"},"esperienze":{e:"\ud83d\ude80",l:"Esperienze"},"wellness":{e:"\u2668\ufe0f",l:"Wellness"}};
+const PH={
+  "Hotel":"https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=1200&q=80",
+  "Ristoranti":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
+  "Bar":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80",
+  "Cocktail bar":"https://images.unsplash.com/photo-1527761939622-933c470e8a2b?auto=format&fit=crop&w=1200&q=80",
+  "Gastronomia / Asporto":"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
+  "Escursioni":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80",
+  "Attività":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
+  "Impianti sciistici":"https://images.unsplash.com/photo-1551698618-1dfe5d97d256?auto=format&fit=crop&w=1200&q=80"
+};
+const PC={"\u20ac":"price-1","\u20ac\u20ac":"price-2","\u20ac\u20ac\u20ac":"price-3","\u20ac\u20ac\u20ac\u20ac":"price-4"};
+
+/* STATE */
+let S={data:FALLBACK_DATA,src:"Dataset integrato",view:"home",dest:null,macro:null,cat:"Tutti",price:"Tutte",season:"Entrambi",q:"",comuneFilter:"Tutti",editMode:false};
+const app=document.getElementById("app"),bc=document.getElementById("bc"),modalBg=document.getElementById("modalBg");
+
+/* UTILS */
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slugify=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+const normH=v=>slugify(v).replace(/-/g,"");
+/* ── IMAGE CACHE (localStorage per HD, thumbnail compresso per Excel) ── */
+const IMG_NS="guidami_img_v1_";
+function imgCacheSet(key,dataUrl){try{localStorage.setItem(IMG_NS+key,dataUrl);}catch(e){console.warn("Storage pieno, immagine non salvata localmente");}}
+function imgCacheGet(key){try{return localStorage.getItem(IMG_NS+key)||null;}catch(e){return null;}}
+/* Comprime un File su canvas e restituisce una Promise<dataUrl> */
+function compressImage(file,maxW=420,maxH=320,quality=0.65){
+  return new Promise(resolve=>{
+    const img=new Image();const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+      const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+      cv.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL("image/jpeg",quality));
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);resolve(null);};
+    img.src=url;
+  });
+}
+/* sImg: controlla prima il cache localStorage (HD), poi il dato (thumbnail), poi placeholder */
+const sImg=(u,t,cacheKey)=>{
+  if(cacheKey){const hd=imgCacheGet(cacheKey);if(hd)return hd;}
+  return(u&&String(u).trim())?String(u).trim():PH[t]||PH["Attivit\u00e0"];
+};
+const gD=s=>(S.data.destinations||[]).find(d=>d.slug===s);
+const aD=()=>S.data.destinations||[];
+const gP=s=>(S.data.places||[]).filter(p=>s?p.destination===s:true);
+const fP=s=>(S.data.places||[]).find(p=>p.slug===s);
+const mS=(v,s)=>{v=v||"Entrambi";return s==="Entrambi"||v==="Entrambi"||v===s};
+const isVetrina=p=>{const v=String(p.vetrina??"").toLowerCase().trim();return p.vetrina===true||p.vetrina===1||["1","si","yes","true"].includes(v)};
+const isPartner=p=>{const v=String(p.premium??"").toLowerCase().trim();return p.premium===true||p.premium===1||["1","si","yes","true"].includes(v)};
+/* Ordina: premium prima, poi il resto */
+const sortPartner=pp=>[...pp].sort((a,b)=>isPartner(b)-isPartner(a));
+const filter=pp=>{const q=S.q.toLowerCase();const res=pp.filter(p=>(S.cat==="Tutti"||p.type===S.cat)&&(S.price==="Tutte"||p.price===S.price)&&mS(p.season,S.season)&&(!q||p.title.toLowerCase().includes(q)||(p.desc||"").toLowerCase().includes(q)||(p.area||"").toLowerCase().includes(q)||p.type.toLowerCase().includes(q)));return sortPartner(res)};
+const filterMacro=pp=>{const res=pp.filter(p=>(S.cat==="Tutti"||p.type===S.cat)&&(S.price==="Tutte"||p.price===S.price)&&mS(p.season,S.season)&&(S.comuneFilter==="Tutti"||p.destination===S.comuneFilter));return sortPartner(res)};
+const iPills=ic=>String(ic||"").split(";").map(s=>s.trim().toLowerCase()).filter(Boolean).map(k=>{const i=LE[k];return i?`<span class="icon-pill"><span>${i.e}</span><span>${esc(i.l)}</span></span>`:""}).join("");
+
+/* GET MACRO DESTS */
+function getMacroDests(macroId){
+  const ma=MACRO_AREAS.find(m=>m.id===macroId);
+  if(!ma)return[];
+  const base=[...(ma.dests||[])];
+  (S.data.destinations||[]).forEach(d=>{
+    if(d.macroarea&&(d.macroarea===macroId||d.macroarea===ma.name)){
+      if(!base.includes(d.slug))base.push(d.slug);
+    }
+  });
+  return[...new Set(base)];
+}
+
+/* MACRO PLACE COUNT */
+function macroPlaceCount(macroId){
+  const dests=getMacroDests(macroId);
+  return(S.data.places||[]).filter(p=>dests.includes(p.destination)).length;
+}
+/* MACRO PREMIUM COUNT */
+function macroPartnerCount(macroId){
+  const dests=getMacroDests(macroId);
+  return(S.data.places||[]).filter(p=>dests.includes(p.destination)&&isPartner(p)).length;
+}
+
+/* NAV */
+function snapS(){return{view:S.view,dest:S.dest,macro:S.macro,cat:S.cat,price:S.price,season:S.season,q:S.q,comuneFilter:S.comuneFilter};}
+function restoreS(st){S.view=st.view||"home";S.dest=st.dest||null;S.macro=st.macro||null;S.cat=st.cat||"Tutti";S.price=st.price||"Tutte";S.season=st.season||"Entrambi";S.q=st.q||"";S.comuneFilter=st.comuneFilter||"Tutti";}
+function nav(v,sl){
+  const go=()=>{
+    if(v==="home"){S.view="home";S.dest=null;S.macro=null;S.season="Entrambi";S.q="";S.comuneFilter="Tutti"}
+    else if(v==="dest"){S.view="dest";S.dest=sl;S.cat="Tutti";S.price="Tutte";S.q=""}
+    else if(v==="macro"){S.view="macro";S.macro=sl;S.cat="Tutti";S.price="Tutte";S.comuneFilter="Tutti"}
+    else if(v==="all"){S.view="all";S.dest=null;S.cat="Tutti";S.price="Tutte";S.q=""}
+    render();window.scrollTo({top:0,behavior:"smooth"});
+    history.pushState(snapS(),"");
+  };
+  if(typeof document.startViewTransition==="function")document.startViewTransition(go);else{app.style.animation="none";app.offsetHeight;app.style.animation="";go()}
+}
+window.addEventListener("popstate",e=>{if(e.state){restoreS(e.state);render();window.scrollTo({top:0,behavior:"smooth"});}});
+
+/* BREADCRUMB */
+function renderBC(){
+  if(S.view==="home"){bc.classList.add("hidden");return}
+  bc.classList.remove("hidden");
+  let h=`<button onclick="nav('home')">Home</button><span class="sep">›</span>`;
+  if(S.view==="all")h+=`<span class="cur">Tutte le localit\u00e0</span>`;
+  else if(S.view==="dest"){const d=gD(S.dest);h+=`<span class="cur">${esc(d?d.name:"")}</span>`}
+  else if(S.view==="macro"){const ma=MACRO_AREAS.find(m=>m.id===S.macro);h+=`<span class="cur">${esc(ma?ma.name:"")}</span>`}
+  bc.innerHTML=h
+}
+
+/* WIDGETS */
+const seasonBtns=()=>SEASONS.map(v=>{let c=S.season===v?(v==="Inverno"?"active-snow":v==="Estate"?"active-sun":"active"):"";let i=v==="Inverno"?"\u2744\ufe0f ":v==="Estate"?"\u2600\ufe0f ":"\ud83c\udfd4\ufe0f ";return`<button class="sbtn ${c}" data-action="set-season" data-value="${esc(v)}">${i}${esc(v)}</button>`}).join("");
+const catChips=()=>CATS.map(v=>`<button class="chip ${S.cat===v?"active":""}" data-action="set-cat" data-value="${esc(v)}">${v==="Tutti"?"\ud83e\udded ":TE[v]?TE[v]+" ":""}${esc(v)}</button>`).join("");
+const priceChips=()=>PRICES.map(v=>`<button class="chip ${S.price===v?"active":""}" data-action="set-price" data-value="${esc(v)}">${esc(v)}</button>`).join("");
+
+/* DEST CARD */
+function destCard(d,i){
+  const n=gP(d.slug).length;
+  const editOverlay=S.editMode?`<div class="edit-overlay"><label class="btn btn-sm" title="Cambia immagine" onclick="event.stopPropagation()">&#x1F5BC;&#xFE0F; <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('dest','${esc(d.slug)}',this.files[0])"></label></div>`:"";
+  return`<article class="dest-card" style="animation-delay:${i*.04}s" onclick="nav('dest','${esc(d.slug)}')">    <div class="dc-imgw">${editOverlay}<img class="dc-img" src="${esc(sImg(d.image,'Attivit\u00e0','dest_'+d.slug))}" alt="${esc(d.name)}" loading="lazy" onerror="this.src='${esc(PH['Attivit\u00e0'])}'">    <div class="dc-over"><div class="dc-name">${esc(d.name)}</div><div class="dc-count">${n} luoghi</div></div></div>    <div class="dc-body"><div class="dc-icons">${iPills(d.icons)}</div>    <p class="dc-desc">${esc(d.description)}</p>    <div class="dc-actions"><button class="btn btn-accent" onclick="event.stopPropagation();nav('dest','${esc(d.slug)}')">Esplora \u2192</button>${d.website?`<a class="btn" href="${esc(d.website)}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()">Sito</a>`:""}</div></div></article>`}
+
+/* MACRO CARD */
+function macroCard(ma,i){
+  const n=macroPlaceCount(ma.id);
+  const nPrem=macroPartnerCount(ma.id);
+  const editOverlay=S.editMode?`<div class="edit-overlay"><label class="btn btn-sm" title="Cambia immagine" onclick="event.stopPropagation()">🖼️ <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('macro','${esc(ma.id)}',this.files[0])"></label></div>`:"";
+  const comuniList=getMacroDests(ma.id).map(sl=>{const d=gD(sl);return d?d.name:sl}).filter(Boolean).slice(0,3).join(' · ');
+  const premBadgeMC=nPrem>0?`<div class="mc-prem-badge">★ ${nPrem} Partner</div>`:'';
+  return`<article class="macro-card" style="animation-delay:${i*.07}s;--area-color:${ma.color}" onclick="${S.editMode?`openEditMacro('${esc(ma.id)}')`:`nav('macro','${esc(ma.id)}')`}"><div class="mc-spotlight"></div>
+    <div class="mc-imgw">${editOverlay}<img class="mc-img" src="${esc(sImg(ma.image,'Attività','macro_'+ma.id))}" alt="${esc(ma.name)}" loading="lazy" onerror="this.src='${esc(PH['Attività'])}'">
+    <div class="mc-over"><div><span class="mc-emoji">${ma.emoji}</span><div class="mc-name" data-scramble="${esc(ma.name)}">${esc(ma.name)}</div>${comuniList?`<div class="mc-comuni">${esc(comuniList)}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${premBadgeMC}<div class="mc-count">${n} luoghi</div></div></div></div>
+    <div class="mc-body"><p class="mc-desc">${esc(ma.desc)}</p>
+    <div class="dc-actions" style="margin-top:10px"><button class="btn btn-accent" onclick="event.stopPropagation();${S.editMode?`openEditMacro('${esc(ma.id)}')`:`nav('macro','${esc(ma.id)}')`}">Esplora →</button></div></div></article>`
+}
+
+/* VETRINA CARD */
+function vetrinaCard(p){
+  const d=gD(p.destination);
+  const partner=isPartner(p);
+  return`<div class="v-card${partner?' is-partner':''}" onclick="openModal(fP('${esc(p.slug)}'))">
+    <div class="v-imgw">
+      <img class="v-img" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='${esc(sImg('',p.type))}'">
+      <div class="v-top-badges">
+        <span class="v-type-badge">${TE[p.type]||'📍'} ${esc(p.type)}</span>
+        ${partner?`<span class="v-partner-badge">★ Partner</span>`:''}
+      </div>
+    </div>
+    <div class="v-body">
+      <div class="v-title">${esc(p.title)}</div>
+      <div class="v-meta">
+        <span class="v-area">📍 ${esc(d?d.name:p.destination)}</span>
+        <span class="v-price">${esc(p.price||'')}</span>
+      </div>
+    </div>
+  </div>`
+}
+
+/* PLACE CARD */
+function placeCard(p,i){
+  const d=gD(p.destination);const dl=Math.min((i||0)*.025,.5);
+  const prem=isPartner(p);
+  const catClass={'Hotel':'cat-hotel','Ristoranti':'cat-ristoranti','Bar':'cat-bar','Cocktail bar':'cat-cocktail','Escursioni':'cat-escursioni','Attività':'cat-attivita','Impianti sciistici':'cat-impianti'}[p.type]||'';
+  const premBadge=prem?`<div class="premium-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Partner</div>`:"";
+  return`<article class="card ${catClass}${prem?' is-premium':''}" style="animation-delay:${dl}s" onclick="openModal(fP('${esc(p.slug)}'))">
+    <div class="c-imgw"><img class="c-img" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='${esc(sImg('',p.type))}'">
+    <div class="c-ot"><div class="badge">${TE[p.type]||'📍'} ${esc(p.type)}</div><div style="display:flex;gap:5px;align-items:center">${premBadge}<div class="price ${PC[p.price]||''}">${esc(p.price||'€€')}</div></div></div></div>
+    <div class="c-body"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div class="c-title">${esc(p.title)}</div>${prem?`<div class="premium-badge" style="margin-top:2px;flex-shrink:0"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Partner</div>`:""}</div>
+    <div class="c-area">${esc(d?d.name:p.destination)} · ${esc(p.area||'')}</div>
+    <p class="c-desc">${esc(p.desc||'')}</p>
+    <div class="c-actions" onclick="event.stopPropagation()"><button class="btn btn-accent" data-action="open" data-value="${esc(p.slug)}">Scopri</button>${p.website?`<a class="btn" href="${esc(p.website)}" target="_blank" rel="noreferrer">Sito →</a>`:''}</div></div></article>`
+}
+
+/* HOME */
+function renderHome(){
+  const ds=aD(),tp=(S.data.places||[]).length;
+  const allPlaces=S.data.places||[];
+  let vetrinaPlaces=allPlaces.filter(isVetrina);
+  if(!vetrinaPlaces.length) vetrinaPlaces=allPlaces.slice(0,10);
+  const vetrinaCards=vetrinaPlaces.map(p=>vetrinaCard(p)).join("");
+  const vetrinaHTML=vetrinaCards?`<section class="section vetrina-section"><div class="section-head"><div><h2>In Vetrina</h2><div class="sub">${allPlaces.some(isVetrina)?"Luoghi selezionati · scorri o trascina":"Alcuni dei luoghi da scoprire"}</div></div><div class="vetrina-arrows"><button class="vetrina-arrow" id="vArrowL" aria-label="Scorri sinistra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><button class="vetrina-arrow" id="vArrowR" aria-label="Scorri destra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button></div></div><div class="vetrina-track-wrapper"><div class="vetrina-track">${vetrinaCards}${vetrinaCards}</div></div></section>`:"";
+
+  app.innerHTML=`<div class="container">
+    <div class="hero"><div class="hero-bg"><img src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=1600&q=80" alt="Valle d'Aosta"></div>
+    <div class="hero-aurora"><div class="aurora-blob aurora-1"></div><div class="aurora-blob aurora-2"></div><div class="aurora-blob aurora-3"></div></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z" fill="currentColor"/></svg> Guida turistica interattiva</div>
+      <h1><span class="hero-gradient-text">Scopri la Valle d'Aosta</span></h1>
+      <p>Hotel, ristoranti, escursioni, impianti sciistici e attivit\u00e0 — seleziona una macro-area per iniziare la tua esplorazione.</p>
+      <div class="hero-stats"><div class="hero-stat"><strong>${MACRO_AREAS.length}</strong>Aree</div><div class="hero-stat"><strong>${ds.length}</strong>Localit\u00e0</div><div class="hero-stat"><strong>${tp}</strong>Luoghi</div></div>
+    </div></div>
+    ${S.editMode?`<div class="edit-banner">✏️ Modalità Modifica attiva — clicca una scheda per modificarla, poi <strong>Scarica Excel</strong> per salvare tutto<span>💡 Tutte le modifiche rimangono in memoria finché non ricarichi la pagina</span></div>`:""}
+    ${vetrinaHTML}
+    <section class="section"><div class="section-head"><div><h2>Esplora per area</h2><div class="sub">${S.editMode?"<span style='color:#c0392b;font-weight:700'>✏️ Clicca una macro-area per modificarla</span>":"Seleziona una macro-area per scoprire hotel, ristoranti e attività"}</div></div></div>
+    <div class="macro-grid">${MACRO_AREAS.map((ma,i)=>macroCard(ma,i)).join("")}</div></section>
+    <div class="footer"><p>GuidamiVDA \u00b7 Dati: ${esc(S.src)} \u00b7 ${tp} schede in ${ds.length} localit\u00e0</p></div>
+  </div>`;bind()}
+
+/* MACRO PAGE */
+function renderMacro(){
+  const ma=MACRO_AREAS.find(m=>m.id===S.macro);
+  if(!ma){nav("home");return}
+  const dests=getMacroDests(ma.id);
+  const allPlaces=(S.data.places||[]).filter(p=>dests.includes(p.destination));
+  const pp=filterMacro(allPlaces);
+  const destSlugs=[...new Set(allPlaces.map(p=>p.destination))];
+  const comuneChips=[
+    `<button class="comune-chip ${S.comuneFilter==='Tutti'?'active':''}" data-action="set-comune" data-value="Tutti">🗺️ Tutti i comuni<span class="cc-count">${allPlaces.length}</span></button>`,
+    ...destSlugs.map(sl=>{const d=gD(sl);const nm=d?d.name:sl;const n=allPlaces.filter(p=>p.destination===sl).length;return`<button class="comune-chip ${S.comuneFilter===sl?'active':''}" data-action="set-comune" data-value="${esc(sl)}">📍 ${esc(nm)}<span class="cc-count">${n}</span></button>`})
+  ].join("");
+  app.innerHTML=`<div class="container">
+    <div class="dest-hero hero"><div class="hero-bg"><img src="${esc(sImg(ma.image,'Attivit\u00e0','macro_'+ma.id))}" alt="${esc(ma.name)}" onerror="this.src='${esc(PH['Attivit\u00e0'])}'"></div>
+    ${S.editMode?`<div class="edit-overlay" style="top:16px;right:16px"><button class="btn btn-sm" style="background:#c0392b;border-color:#c0392b;color:#fff" onclick="openEditMacro('${esc(ma.id)}')">✏️ Modifica quest'area</button></div>`:""}
+    <div class="hero-content">
+      <div class="hero-eyebrow">${ma.emoji} ${esc(ma.name)}</div>
+      <h1>${esc(ma.name)}</h1>
+      <p style="margin-top:6px;color:rgba(255,255,255,.7);font-size:15px">${esc(ma.desc)}</p>
+    </div></div>
+    ${S.editMode?`<div class="edit-banner">✏️ Clicca una scheda per modificarne nome, prezzo, descrizione, foto e altro <span>Poi vai su <strong>Scarica Excel</strong> per salvare tutto</span></div>`:""}
+
+    <div class="filter-bar">
+      <div style="width:100%"><div class="fl">📍 Comune</div><div class="comune-chips">${comuneChips}</div></div>
+      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+    </div>
+    <div class="results-info">${pp.length} di ${allPlaces.length} luoghi \u00b7 ${esc(ma.name)}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato. Prova a cambiare i filtri.</div>`}</div></section>
+    <div class="footer"><p>GuidamiVDA \u00b7 ${esc(ma.name)} \u00b7 Dati: ${esc(S.src)}</p></div>
+  </div>`;bind()}
+
+/* ALL */
+function renderAll(){
+  const pp=filter(gP(null));
+  app.innerHTML=`<div class="container">
+    <div class="filter-bar">
+      <div class="fg fg-wide"><div class="fl">Cerca</div><input class="search-input" type="text" placeholder="Cerca hotel, ristoranti, escursioni..." value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
+      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+    </div>
+    <div class="results-info">${pp.length} risultati \u00b7 ${esc(S.cat)} \u00b7 ${esc(S.price==="Tutte"?"Tutte le fasce":S.price)} \u00b7 ${esc(S.season)}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato per i filtri selezionati.</div>`}</div></section>
+    <div class="footer"><p>GuidamiVDA \u00b7 ${(S.data.places||[]).length} schede totali</p></div>
+  </div>`;bind();focusSearch()}
+
+/* DEST PAGE */
+function renderDest(){
+  const d=gD(S.dest);if(!d){nav("home");return}
+  const all=gP(d.slug),pp=filter(all);
+  app.innerHTML=`<div class="container">
+    <div class="dest-hero hero"><div class="hero-bg"><img src="${esc(sImg(d.image,'Attivit\u00e0','dest_'+d.slug))}" alt="${esc(d.name)}" onerror="this.src='${esc(PH['Attivit\u00e0'])}'"></div>
+    <div class="hero-content">
+      <h1>${esc(d.name)}</h1>
+      <p style="margin-top:6px;color:rgba(255,255,255,.7);font-size:15px">${esc(d.description)}</p>
+      <div class="dest-hero-pills">${iPills(d.icons)}</div>
+      ${d.website?`<div class="dest-hero-link"><a href="${esc(d.website)}" target="_blank" rel="noreferrer">Sito ufficiale \u2192</a></div>`:""}
+    </div></div>
+    <div class="filter-bar">
+      <div class="fg fg-wide"><div class="fl">Cerca a ${esc(d.name)}</div><input class="search-input" type="text" placeholder="Cerca hotel, ristoranti, escursioni..." value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
+      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+    </div>
+    <div class="results-info">${pp.length} di ${all.length} luoghi a ${esc(d.name)}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato. Prova a cambiare i filtri.</div>`}</div></section>
+    <div class="footer"><p>GuidamiVDA \u00b7 ${esc(d.name)} \u00b7 Dati: ${esc(S.src)}</p></div>
+  </div>`;bind();focusSearch()}
+
+function focusSearch(){const si=document.querySelector(".search-input");if(si&&S.q){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
+
+/* MODAL */
+function openModal(p){
+  if(!p)return;
+  if(S.editMode){openEditModal(p);return;}
+  const d=gD(p.destination);
+  const editBtn=S.editMode?`<button class="btn btn-sm" style="margin-top:8px" onclick="startEditDesc('place','${esc(p.slug)}')">&#x270F;&#xFE0F; Modifica descrizione</button><label class="btn btn-sm" style="margin-top:8px" onclick="event.stopPropagation()">&#x1F5BC;&#xFE0F; Cambia immagine<input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('place','${esc(p.slug)}',this.files[0])"></label>`:"";
+  modalBg.innerHTML=`<div class="modal" onclick="event.stopPropagation()"><div class="modal-drag"></div><div class="modal-inner">
+    <div class="m-imgw"><img id="modalImg" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" onerror="this.src='${esc(sImg('',p.type))}'">    <button class="close-btn" onclick="closeModal()">&#x2715;</button>    <div class="m-over"><div><div class="m-title">${esc(p.title)}</div><div class="m-sub">${esc(d?d.name:p.destination)} \u00b7 ${esc(p.area||"")}</div></div>    <div class="price ${PC[p.price]||""}" style="flex-shrink:0;font-size:13px">${esc(p.price)}</div></div></div>
+    <p class="m-desc" id="modalDesc">${esc(p.desc||"")}</p>
+    ${editBtn}
+    <div class="m-grid"><div class="info-box"><div class="info-box-label">Informazioni</div>
+      <div class="info-row"><strong>Categoria</strong>${TE[p.type]||""} ${esc(p.type)}</div>
+      <div class="info-row"><strong>Zona</strong>${esc(p.area||"—")}</div>
+      <div class="info-row"><strong>Stagione</strong>${esc(p.season||"Entrambi")}</div>
+      <div class="info-row"><strong>Prezzo</strong>${esc(p.price||"—")}</div>
+      <div class="info-row"><strong>Localit\u00e0</strong>${esc(d?d.name:p.destination)}</div>
+    </div><div class="info-box"><div class="info-box-label">Azioni</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${p.website?`<a class="btn btn-accent" href="${esc(p.website)}" target="_blank" rel="noreferrer" style="justify-content:center">Vai al sito ufficiale \u2192</a>`:`<span style="color:var(--soft);font-size:13px">Sito non disponibile</span>`}
+        <button class="btn" onclick="closeModal()" style="justify-content:center">\u2190 Torna alla lista</button>
+      </div></div></div></div></div>`;
+  modalBg.classList.add("open");document.body.style.overflow="hidden"}
+function closeModal(){modalBg.classList.remove("open");modalBg.innerHTML="";document.body.style.overflow=""}
+
+/* EDIT MODE */
+function toggleEditMode(){
+  S.editMode=!S.editMode;
+  const btn=document.getElementById("editModeBtn");
+  if(btn){
+    btn.className=S.editMode?"btn btn-active":"btn";
+    btn.innerHTML=S.editMode?"<span>✏️</span> Modifica <strong>ON</strong>":"✏️ Modifica";
+    btn.style.background=S.editMode?"#c0392b":"";
+    btn.style.borderColor=S.editMode?"#c0392b":"";
+  }
+  render();
+  if(S.editMode)showToast("✏️ Modalità modifica attiva — clicca qualsiasi scheda per modificarla");
+}
+
+function startEditDesc(type,slug){
+  if(type==="place"){
+    const p=fP(slug);if(!p)return;
+    const el=document.getElementById("modalDesc");if(!el)return;
+    const ta=document.createElement("textarea");
+    ta.className="m-desc-edit";ta.value=p.desc||"";
+    ta.onblur=()=>saveDesc("place",slug,ta.value);
+    el.replaceWith(ta);ta.focus();
+  }
+}
+
+function saveDesc(type,slug,val){
+  if(type==="place"){const p=fP(slug);if(p)p.desc=val;}
+  else if(type==="dest"){const d=gD(slug);if(d)d.description=val;}
+  else if(type==="macro"){const ma=MACRO_AREAS.find(m=>m.id===slug);if(ma)ma.desc=val;}
+}
+
+/* Aggiorna qualsiasi campo di un oggetto dati */
+function updateField(type,slug,field,val){
+  if(type==="place"){const p=fP(slug);if(p)p[field]=val;}
+  else if(type==="dest"){const d=gD(slug);if(d)d[field]=val;}
+  else if(type==="macro"){const ma=MACRO_AREAS.find(m=>m.id===slug);if(ma)ma[field]=val;}
+}
+
+/* ═══ EDIT MODAL COMPLETO PER LUOGO ═══ */
+function openEditModal(p){
+  if(!p)return;
+  const d=gD(p.destination);
+  const imgSrc=sImg(p.image,p.type,'place_'+p.slug);
+  const catOpts=CATS.filter(c=>c!=="Tutti").map(v=>`<option value="${esc(v)}"${p.type===v?" selected":""}>${esc(v)}</option>`).join("");
+  const priceOpts=PRICES.filter(v=>v!=="Tutte").map(v=>`<option value="${esc(v)}"${p.price===v?" selected":""}>${esc(v)}</option>`).join("");
+  const seasonOpts=SEASONS.map(v=>`<option value="${esc(v)}"${(p.season||"Entrambi")===v?" selected":""}>${esc(v)}</option>`).join("");
+  modalBg.innerHTML=`<div class="modal edit-modal-form" onclick="event.stopPropagation()">
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="edit-form-header">
+        <h3><span class="ef-tag">✏️ Modifica</span> ${esc(p.title)}</h3>
+        <button class="close-btn" style="position:relative;top:auto;right:auto" onclick="closeModal()">✕</button>
+      </div>
+      <div class="ef-grid">
+        <div class="ef-field ef-full">
+          <div class="ef-label">📸 Immagine</div>
+          <div class="ef-img-row">
+            <img id="modalImg" class="ef-img-thumb" src="${esc(imgSrc)}" alt="${esc(p.title)}" onerror="this.src='${esc(sImg('',p.type))}'">
+            <label class="btn btn-sm" style="cursor:pointer" onclick="event.stopPropagation()">
+              🖼️ Cambia foto
+              <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('place','${esc(p.slug)}',this.files[0])">
+            </label>
+          </div>
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">✏️ Nome / Titolo</label>
+          <input class="ef-input" value="${esc(p.title)}" oninput="updateField('place','${esc(p.slug)}','title',this.value)">
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">📝 Descrizione</label>
+          <textarea class="ef-textarea" oninput="updateField('place','${esc(p.slug)}','desc',this.value)">${esc(p.desc||"")}</textarea>
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">🏷️ Categoria</label>
+          <select class="ef-select" onchange="updateField('place','${esc(p.slug)}','type',this.value)">${catOpts}</select>
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">💶 Prezzo</label>
+          <select class="ef-select" onchange="updateField('place','${esc(p.slug)}','price',this.value)">${priceOpts}</select>
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">❄️ Stagione</label>
+          <select class="ef-select" onchange="updateField('place','${esc(p.slug)}','season',this.value)">${seasonOpts}</select>
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">📍 Zona / Area</label>
+          <input class="ef-input" value="${esc(p.area||"")}" oninput="updateField('place','${esc(p.slug)}','area',this.value)">
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">🌐 Sito Web</label>
+          <input class="ef-input" type="url" placeholder="https://..." value="${esc(p.website||"")}" oninput="updateField('place','${esc(p.slug)}','website',this.value)">
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">⭐ Vetrina</label>
+          <label class="ef-checkbox-row">
+            <input type="checkbox" ${isVetrina(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','vetrina',this.checked?'1':'0')">
+            <span>Mostra questo luogo nella vetrina della home page</span>
+          </label>
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label" style="color:#b8860b">👑 Partner</label>
+          <label class="ef-checkbox-row" style="border-color:rgba(201,160,51,.4);background:rgba(253,248,236,.6)">
+            <input type="checkbox" ${isPartner(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','premium',this.checked?'1':'0')">
+            <span>Scheda <strong>Partner</strong> — appare sempre per prima negli elenchi con badge dorato</span>
+          </label>
+        </div>
+      </div>
+      <div class="ef-actions">
+        <button class="btn btn-accent" onclick="closeModal();showToast('✅ Modifiche salvate in memoria — scarica l\\'Excel per esportare')">✓ Salva e chiudi</button>
+        <button class="btn" onclick="closeModal()">← Annulla</button>
+      </div>
+    </div>
+  </div>`;
+  modalBg.classList.add("open");document.body.style.overflow="hidden";
+}
+
+/* ═══ EDIT MODAL PER MACRO AREA ═══ */
+function openEditMacro(id){
+  const ma=MACRO_AREAS.find(m=>m.id===id);if(!ma)return;
+  const imgSrc=sImg(ma.image,'Attività','macro_'+ma.id);
+  modalBg.innerHTML=`<div class="modal edit-modal-form" onclick="event.stopPropagation()">
+    <div class="modal-drag"></div>
+    <div class="modal-inner">
+      <div class="edit-form-header">
+        <h3><span class="ef-tag">✏️ Area</span> ${ma.emoji} ${esc(ma.name)}</h3>
+        <button class="close-btn" style="position:relative;top:auto;right:auto" onclick="closeModal()">✕</button>
+      </div>
+      <div class="ef-grid">
+        <div class="ef-field ef-full">
+          <div class="ef-label">📸 Immagine area</div>
+          <div class="ef-img-row">
+            <img id="macroImg" class="ef-img-thumb" src="${esc(imgSrc)}" alt="${esc(ma.name)}" onerror="this.style.display='none'">
+            <label class="btn btn-sm" style="cursor:pointer" onclick="event.stopPropagation()">
+              🖼️ Cambia foto area
+              <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('macro','${esc(ma.id)}',this.files[0]);document.getElementById('macroImg')&&(document.getElementById('macroImg').src=URL.createObjectURL(this.files[0]))">
+            </label>
+          </div>
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">🏔️ Nome area</label>
+          <input class="ef-input" value="${esc(ma.name)}" oninput="updateField('macro','${esc(ma.id)}','name',this.value)">
+        </div>
+        <div class="ef-field">
+          <label class="ef-label">😊 Emoji</label>
+          <input class="ef-input" value="${esc(ma.emoji)}" oninput="updateField('macro','${esc(ma.id)}','emoji',this.value)" maxlength="4" style="font-size:22px;text-align:center">
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">📝 Descrizione breve</label>
+          <textarea class="ef-textarea" oninput="updateField('macro','${esc(ma.id)}','desc',this.value)">${esc(ma.desc||"")}</textarea>
+        </div>
+        <div class="ef-field ef-full">
+          <label class="ef-label">📍 Comuni inclusi (slug separati da virgola)</label>
+          <input class="ef-input" value="${esc((ma.dests||[]).join(', '))}" oninput="updateField('macro','${esc(ma.id)}','dests',this.value.split(',').map(s=>s.trim()).filter(Boolean))">
+          <div style="font-size:11px;color:var(--soft);margin-top:3px">Es: courmayeur, la-thuile, morgex</div>
+        </div>
+      </div>
+      <div class="ef-actions">
+        <button class="btn btn-accent" onclick="closeModal();render();showToast('✅ Area aggiornata')">✓ Salva e aggiorna</button>
+        <button class="btn" onclick="closeModal()">← Annulla</button>
+      </div>
+    </div>
+  </div>`;
+  modalBg.classList.add("open");document.body.style.overflow="hidden";
+}
+
+async function handleImageUpload(type,slug,file){
+  if(!file)return;
+  const cacheKey=`${type}_${slug}`;
+  /* 1) Salva versione HD in localStorage (per display nitido) */
+  const hdReader=new FileReader();
+  hdReader.onload=e=>{imgCacheSet(cacheKey,e.target.result);};
+  hdReader.readAsDataURL(file);
+  /* 2) Comprimi per Excel (≤25KB base64, entro limite cella) */
+  const thumb=await compressImage(file,420,320,0.65);
+  if(!thumb)return;
+  if(type==="place"){
+    const p=fP(slug);
+    if(p){
+      p.image=thumb; // thumbnail → Excel-safe
+      /* Mostra subito HD nell'anteprima modale */
+      const previewReader=new FileReader();
+      previewReader.onload=e=>{const img=document.getElementById("modalImg");if(img)img.src=e.target.result;};
+      previewReader.readAsDataURL(file);
+      showToast("📸 Immagine caricata — verrà salvata nell'Excel");
+    }
+  } else if(type==="dest"){
+    const d=gD(slug);if(d){d.image=thumb;render();}
+  } else if(type==="macro"){
+    const ma=MACRO_AREAS.find(m=>m.id===slug);if(ma){ma.image=thumb;render();}
+  }
+}
+
+/* RENDER */
+/* ── TOAST ── */
+let _toastTimer=null;
+function showToast(msg,duration=3500){
+  let t=document.getElementById("g-toast");
+  if(!t){t=document.createElement("div");t.id="g-toast";t.style.cssText="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#1a2e1a;color:#fff;padding:12px 22px;border-radius:40px;font-size:14px;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;border:1px solid rgba(255,255,255,.12);white-space:nowrap;max-width:90vw;text-align:center";document.body.appendChild(t);}
+  t.textContent=msg;
+  t.style.opacity="1";t.style.transform="translateX(-50%) translateY(0)";
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(20px)";},duration);
+}
+function render(){closeModal();renderBC();if(S.view==="dest")renderDest();else if(S.view==="all")renderAll();else if(S.view==="macro")renderMacro();else renderHome()}
+
+/* BIND */
+function bind(){document.querySelectorAll("[data-action]").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const a=el.getAttribute("data-action"),v=el.getAttribute("data-value");if(a==="set-season"){S.season=v;render()}if(a==="set-cat"){S.cat=v;render()}if(a==="set-price"){S.price=v;render()}if(a==="choose"){nav("dest",v)}if(a==="set-comune"){S.comuneFilter=v;render()}if(a==="open"){openModal(fP(v))}})});setTimeout(initEffects,50);}
+modalBg.addEventListener("click",closeModal);
+
+/* EXCEL UTILS */
+function valAt(r,m,ks){for(const k of ks)if(m[k]!==undefined)return r[m[k]];return""}
+function deriveDests(pp){const fb=new Map((FALLBACK_DATA.destinations||[]).map(d=>[d.slug,d]));return[...new Set(pp.map(p=>p.destination).filter(Boolean))].map(s=>fb.get(s)||{slug:s,name:s.replace(/-/g," ").replace(/\b\w/g,m=>m.toUpperCase()),seasonality:"Entrambi",description:"",icons:"paese",image:"",website:""})}
+function parseWB(wb){
+  const ws=wb.Sheets["Luoghi"];if(!ws)throw new Error("Manca il foglio 'Luoghi'.");
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});const h={};(rows[0]||[]).forEach((v,i)=>h[normH(v)]=i);
+  const pp=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
+    slug:slugify(valAt(r,h,["nomeluogo","nome","title"])),
+    destination:slugify(valAt(r,h,["localita","sluglocalita"]))||"courmayeur",
+    title:String(valAt(r,h,["nomeluogo","nome","title"])||"").trim(),
+    type:String(valAt(r,h,["tipo","categoria","type","category"])||"Attivit\u00e0").trim(),
+    area:String(valAt(r,h,["zona","area"])||"").trim(),
+    price:String(valAt(r,h,["fasciaprezzo","price"])||"\u20ac\u20ac").trim(),
+    season:String(valAt(r,h,["stagione","season"])||"Entrambi").trim(),
+    desc:String(valAt(r,h,["descrizione","description"])||"").trim(),
+    website:String(valAt(r,h,["sitoweb","website","link"])||"").trim(),
+    image:String(valAt(r,h,["urlfotoopz","urlfoto","image","imageurl"])||"").trim(),
+    vetrina:["1","si","yes","true"].includes(String(valAt(r,h,["invetrina","vetrina","featured"])||"").toLowerCase().trim()),
+    premium:["1","si","yes","true"].includes(String(valAt(r,h,["premium","inevidenza","evidenza","top","sponsored"])||"").toLowerCase().trim()),
+  }));
+  const wd=wb.Sheets["Destinazioni"];let ds=[];
+  if(wd){const dr=XLSX.utils.sheet_to_json(wd,{header:1,defval:""});const dh={};(dr[0]||[]).forEach((v,i)=>dh[normH(v)]=i);
+    ds=dr.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
+      slug:slugify(valAt(r,dh,["sluglocalita","localita","slug"])),
+      name:String(valAt(r,dh,["nomelocalita","name"])||"").trim(),
+      seasonality:String(valAt(r,dh,["stagione","season"])||"Entrambi").trim(),
+      description:String(valAt(r,dh,["descrizionebreve","description"])||"").trim(),
+      icons:String(valAt(r,dh,["iconelocalita","icons"])||"paese").trim(),
+      image:String(valAt(r,dh,["urlfotolocalita","image"])||"").trim(),
+      website:String(valAt(r,dh,["sitolocalita","website"])||"").trim(),
+      macroarea:String(valAt(r,dh,["macroarea","area","macro"])||"").trim(),
+    })).filter(d=>d.slug)}
+  if(!ds.length)ds=deriveDests(pp);
+  const fm=new Map((FALLBACK_DATA.destinations||[]).map(d=>[d.slug,d]));
+  ds=ds.map(d=>{const fb=fm.get(d.slug)||{};return{...fb,...d,name:d.name||fb.name||d.slug,description:d.description||fb.description||"",icons:d.icons||fb.icons||"paese",image:d.image||fb.image||"",website:d.website||fb.website||""}});
+  ds.forEach(d=>{
+    if(d.macroarea){
+      const ma=MACRO_AREAS.find(m=>m.id===d.macroarea||m.name===d.macroarea);
+      if(ma&&!ma.dests.includes(d.slug))ma.dests.push(d.slug);
+    }
+  });
+  return{destinations:ds,places:pp}}
+
+/* DOWNLOAD EXCEL */
+/* Tronca stringhe troppo lunghe per Excel (limite cella: 32.767 char) */
+const safeCell=(v,max=32000)=>{const s=String(v||"");return s.length>max?"":s;};
+const safeImg=(u)=>{
+  const s=String(u||"");
+  /* Se è un data URL base64 troppo grande, non lo salviamo nella cella */
+  if(s.startsWith("data:")&&s.length>30000)return"";
+  return s;
+};
+
+function downloadExcel(){
+  if(typeof XLSX==="undefined"){alert("Libreria XLSX non disponibile.");return}
+  try{
+    const wb=XLSX.utils.book_new();
+    const luoghiHeaders=["Nome Luogo","Localita","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
+    const luoghiRows=(S.data.places||[]).map(p=>[
+      safeCell(p.title),safeCell(p.destination),safeCell(p.type),safeCell(p.area),
+      safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+      safeImg(p.image),isVetrina(p)?"1":"0",isPartner(p)?"1":"0"
+    ]);
+    const wsL=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows]);
+    XLSX.utils.book_append_sheet(wb,wsL,"Luoghi");
+    const destHeaders=["Slug Localita","Nome Localita","Stagione","Descrizione Breve","Icone Localita","URL Foto Localita","Sito Localita","Macroarea"];
+    const destRows=(S.data.destinations||[]).map(d=>{
+      const ma=MACRO_AREAS.find(m=>m.dests.includes(d.slug));
+      return[safeCell(d.slug),safeCell(d.name),safeCell(d.seasonality),safeCell(d.description),
+             safeCell(d.icons),safeImg(d.image),safeCell(d.website),ma?ma.id:""];
+    });
+    const wsD=XLSX.utils.aoa_to_sheet([destHeaders,...destRows]);
+    XLSX.utils.book_append_sheet(wb,wsD,"Destinazioni");
+    XLSX.writeFile(wb,"GuidamiVDA_export.xlsx");
+    showToast("✅ Excel scaricato! Le immagini caricate sono incluse se compresse.");
+  }catch(err){
+    /* Fallback: riprova senza immagini base64 */
+    console.warn("Download Excel fallito (prob. immagini troppo grandi), ritento senza immagini:",err);
+    try{
+      const wb2=XLSX.utils.book_new();
+      const luoghiHeaders=["Nome Luogo","Localita","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
+      const luoghiRows2=(S.data.places||[]).map(p=>[
+        safeCell(p.title),safeCell(p.destination),safeCell(p.type),safeCell(p.area),
+        safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+        String(p.image||"").startsWith("data:")?"":safeCell(p.image)/* URL esterna ok */,
+        isVetrina(p)?"1":"0",isPartner(p)?"1":"0"
+      ]);
+      const wsL2=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows2]);
+      XLSX.utils.book_append_sheet(wb2,wsL2,"Luoghi");
+      const destHeaders=["Slug Localita","Nome Localita","Stagione","Descrizione Breve","Icone Localita","URL Foto Localita","Sito Localita","Macroarea"];
+      const destRows2=(S.data.destinations||[]).map(d=>{
+        const ma=MACRO_AREAS.find(m=>m.dests.includes(d.slug));
+        return[safeCell(d.slug),safeCell(d.name),safeCell(d.seasonality),safeCell(d.description),
+               safeCell(d.icons),String(d.image||"").startsWith("data:")?"":safeCell(d.image),safeCell(d.website),ma?ma.id:""];
+      });
+      const wsD2=XLSX.utils.aoa_to_sheet([destHeaders,...destRows2]);
+      XLSX.utils.book_append_sheet(wb2,wsD2,"Destinazioni");
+      XLSX.writeFile(wb2,"GuidamiVDA_export.xlsx");
+      showToast("⚠️ Excel scaricato senza immagini caricate (troppo grandi per Excel). Testo e descrizioni salvati.");
+    }catch(err2){alert("Errore download Excel: "+err2.message);}
+  }
+}
+
+/* ═══ 3D TILT + SPOTLIGHT ═══ */
+function initTilt(){
+  document.querySelectorAll('.macro-card').forEach(card=>{
+    const shine=card.querySelector('.mc-spotlight');
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5;
+      const y=(e.clientY-r.top)/r.height-.5;
+      card.style.transform=`perspective(900px) rotateY(${x*10}deg) rotateX(${-y*10}deg) translateZ(10px)`;
+      if(shine){
+        shine.style.setProperty('--sx',`${e.clientX-r.left}px`);
+        shine.style.setProperty('--sy',`${e.clientY-r.top}px`);
+      }
+    });
+    card.addEventListener('mouseleave',()=>{
+      card.style.transform='perspective(900px) rotateY(0deg) rotateX(0deg) translateZ(0px)';
+      card.style.transition='transform .6s var(--ease)';
+      setTimeout(()=>card.style.transition='',600);
+    });
+  });
+}
+
+/* ═══ MAGNETIC BUTTONS ═══ */
+function initMagnetic(){
+  document.querySelectorAll('.btn-accent').forEach(btn=>{
+    btn.addEventListener('mousemove',e=>{
+      const r=btn.getBoundingClientRect();
+      const x=(e.clientX-r.left-r.width/2)*.25;
+      const y=(e.clientY-r.top-r.height/2)*.25;
+      btn.style.transform=`translate(${x}px,${y}px)`;
+    });
+    btn.addEventListener('mouseleave',()=>{
+      btn.style.transform='';
+      btn.style.transition='transform .4s var(--spring)';
+      setTimeout(()=>btn.style.transition='',400);
+    });
+    btn.addEventListener('mouseenter',()=>{btn.style.transition='transform .1s'});
+  });
+}
+
+/* ═══ BTN RIPPLE ═══ */
+function initRipple(){
+  document.querySelectorAll('.btn').forEach(btn=>{
+    btn.addEventListener('mousemove',e=>{
+      const r=btn.getBoundingClientRect();
+      btn.style.setProperty('--bx',`${e.clientX-r.left}px`);
+      btn.style.setProperty('--by',`${e.clientY-r.top}px`);
+    });
+  });
+}
+
+/* ═══ TEXT SCRAMBLE ═══ */
+const CHARS='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+function scrambleText(el,original,duration=600){
+  let start=null;
+  function frame(ts){
+    if(!start)start=ts;
+    const progress=Math.min((ts-start)/duration,1);
+    const revealCount=Math.floor(progress*original.length);
+    let result='';
+    for(let i=0;i<original.length;i++){
+      if(original[i]===' '){result+=' ';continue}
+      result+=i<revealCount?original[i]:CHARS[Math.floor(Math.random()*CHARS.length)];
+    }
+    el.textContent=result;
+    if(progress<1)requestAnimationFrame(frame);
+    else el.textContent=original;
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ═══ HERO PARALLAX ═══ */
+function initParallax(){
+  const hero=document.querySelector('.hero');
+  const img=hero&&hero.querySelector('.hero-bg img');
+  if(!img)return;
+  hero.addEventListener('mousemove',e=>{
+    const r=hero.getBoundingClientRect();
+    const x=(e.clientX-r.left-r.width/2)/r.width*8;
+    const y=(e.clientY-r.top-r.height/2)/r.height*6;
+    img.style.transform=`scale(1.06) translate(${x}px,${y}px)`;
+  });
+  hero.addEventListener('mouseleave',()=>{img.style.transform=''});
+}
+
+/* ═══ QUICK SEARCH (press /) ═══ */
+function initQuickSearch(){
+  document.addEventListener('keydown',e=>{
+    if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){
+      e.preventDefault();
+      nav('all');
+      setTimeout(()=>{const si=document.querySelector('.search-input');if(si){si.focus();si.select()}},200);
+    }
+    if(e.key==='Escape'){closeModal();}
+  });
+}
+
+/* ═══ VETRINA DRAG + AUTO-SCROLL ═══ */
+function initVetrina(){
+  const wrapper=document.querySelector('.vetrina-track-wrapper');
+  const track=document.querySelector('.vetrina-track');
+  if(!wrapper||!track)return;
+  /* duplica le card per loop infinito */
+  const orig=track.innerHTML;
+  track.innerHTML=orig+orig;
+  let pos=0;
+  let speed=0.6; /* px per frame auto */
+  let dragging=false;
+  let startX=0;
+  let startPos=0;
+  let raf=null;
+  let lastDragTime=0;
+  let dragVelocity=0;
+  let lastDragX=0;
+  const halfW=track.scrollWidth/2;
+  function loop(){
+    if(!dragging){
+      pos+=speed;
+      if(dragVelocity!==0){
+        pos+=dragVelocity;
+        dragVelocity*=0.92;
+        if(Math.abs(dragVelocity)<0.05)dragVelocity=0;
+      }
+    }
+    if(pos>=halfW)pos=0;
+    if(pos<0)pos=halfW+pos;
+    track.style.transform=`translateX(${-pos}px)`;
+    raf=requestAnimationFrame(loop);
+  }
+  raf=requestAnimationFrame(loop);
+  /* mouse drag */
+  wrapper.addEventListener('mousedown',e=>{dragging=true;startX=e.clientX;startPos=pos;lastDragX=e.clientX;lastDragTime=Date.now();wrapper.classList.add('is-dragging');});
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const now=Date.now();const dx=e.clientX-lastDragX;
+    dragVelocity=dx/(now-lastDragTime+1)*16;
+    lastDragX=e.clientX;lastDragTime=now;
+    pos=startPos-(e.clientX-startX);
+    if(pos>=halfW)pos=0;if(pos<0)pos=halfW+pos;
+  });
+  window.addEventListener('mouseup',()=>{if(!dragging)return;dragging=false;wrapper.classList.remove('is-dragging');});
+  /* touch drag */
+  wrapper.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startPos=pos;lastDragX=startX;lastDragTime=Date.now();dragging=true;},{passive:true});
+  wrapper.addEventListener('touchmove',e=>{
+    if(!dragging)return;
+    const now=Date.now();const dx=e.touches[0].clientX-lastDragX;
+    dragVelocity=dx/(now-lastDragTime+1)*16;
+    lastDragX=e.touches[0].clientX;lastDragTime=now;
+    pos=startPos-(e.touches[0].clientX-startX);
+    if(pos>=halfW)pos=0;if(pos<0)pos=halfW+pos;
+  },{passive:true});
+  wrapper.addEventListener('touchend',()=>{dragging=false;});
+  /* pausa al hover (solo su non-touch) */
+  wrapper.addEventListener('mouseenter',()=>{if(!dragging)speed=0;});
+  wrapper.addEventListener('mouseleave',()=>{speed=0.6;});
+  /* frecce */
+  const btnL=document.getElementById('vArrowL');
+  const btnR=document.getElementById('vArrowR');
+  const STEP=280;
+  if(btnL) btnL.addEventListener('click',()=>{pos=Math.max(0,pos-STEP);});
+  if(btnR) btnR.addEventListener('click',()=>{pos=(pos+STEP)%halfW;});
+}
+
+/* ═══ SCROLL PROGRESS ═══ */
+window.addEventListener('scroll',()=>{
+  const p=document.getElementById('scrollProgress');
+  if(p){const s=document.documentElement;p.style.width=((s.scrollTop||document.body.scrollTop)/(s.scrollHeight-s.clientHeight)*100)+'%'}
+},{passive:true});
+
+/* ═══ TOPBAR SCROLL ═══ */
+window.addEventListener('scroll',()=>{
+  const tb=document.querySelector('.topbar');
+  if(tb) tb.classList.toggle('scrolled',window.scrollY>20);
+},{passive:true});
+
+/* ═══ STAGGER CARDS ON SCROLL ═══ */
+function initScrollReveal(){
+  if(!('IntersectionObserver' in window))return;
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.style.animationPlayState='running';
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:.1});
+  document.querySelectorAll('.card,.dest-card,.macro-card,.v-card').forEach(el=>{
+    el.style.animationPlayState='paused';
+    obs.observe(el);
+  });
+}
+
+/* ═══ INIT ALL EFFECTS ═══ */
+function initEffects(){
+  initTilt();
+  initMagnetic();
+  initRipple();
+  initScrollReveal();
+  initParallax();
+  initQuickSearch();
+  initVetrina();
+  document.querySelectorAll('[data-scramble]').forEach(el=>{
+    const orig=el.getAttribute('data-scramble');
+    el.closest('.macro-card')&&el.closest('.macro-card').addEventListener('mouseenter',()=>scrambleText(el,orig));
+  });
+}
+
+/* LOAD */
+async function loadBundled(){
+  try{const r=await fetch("./data/GuidamiVDA_data.xlsx",{cache:"no-store"});if(!r.ok)throw 0;const b=await r.arrayBuffer();S.data=parseWB(XLSX.read(b,{type:"array"}));S.src="Excel incluso"}
+  catch{S.data=FALLBACK_DATA;S.src="Dataset integrato (204 schede)"}
+  S.view="home";S.dest=null;render();history.replaceState(snapS(),"");}
+document.getElementById("xlsInput").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{const b=await f.arrayBuffer();S.data=parseWB(XLSX.read(b,{type:"array"}));S.src="Excel: "+f.name;nav("home")}catch(err){alert("Errore: "+err.message)}});
+document.getElementById("reloadBtn").addEventListener("click",loadBundled);
+loadBundled();
+</script>
+</body>
+</html>
