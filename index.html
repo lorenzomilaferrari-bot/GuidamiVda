@@ -315,6 +315,33 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
 @keyframes editPulse{0%,100%{box-shadow:0 0 0 3px rgba(44,94,63,.5)}50%{box-shadow:0 0 0 6px rgba(44,94,63,.2)}}
 
 /* ═══ FOOTER ═══ */
+.contatti-section{margin-top:48px;padding:32px;background:rgba(255,255,255,.7);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.9);border-radius:var(--r);box-shadow:0 4px 24px rgba(0,0,0,.05)}
+.contatti-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.contatti-col{display:flex;flex-direction:column;gap:6px}
+.contatti-label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;font-weight:800;color:var(--soft);margin-bottom:4px}
+.contatti-value{font-size:15px;font-weight:700;color:var(--text)}
+.contatti-sub{font-size:13px;color:var(--soft);line-height:1.5}
+.contatti-mail{font-size:13.5px;font-weight:600;color:var(--accent-dark);text-decoration:none;transition:opacity .2s}
+.contatti-mail:hover{opacity:.75}
+/* ═══ SEGNALA MODAL ═══ */
+.segnala-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:3000;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.segnala-overlay.open{opacity:1;pointer-events:all}
+.segnala-modal{width:min(540px,100%);background:rgba(255,255,255,.97);backdrop-filter:blur(24px);border-radius:28px 28px 0 0;padding:32px 28px 40px;box-shadow:0 -20px 80px rgba(0,0,0,.18);transform:translateY(40px);transition:transform .35s cubic-bezier(.34,1.26,.64,1);max-height:92vh;overflow-y:auto}
+.segnala-overlay.open .segnala-modal{transform:translateY(0)}
+.segnala-drag{width:40px;height:4px;background:var(--line);border-radius:4px;margin:0 auto 24px}
+.segnala-title{font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px}
+.segnala-sub{font-size:13px;color:var(--soft);margin-bottom:24px}
+.segnala-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.segnala-field label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--soft)}
+.segnala-field input,.segnala-field textarea,.segnala-field select{padding:11px 14px;border:1.5px solid rgba(228,225,219,.8);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:rgba(255,255,255,.8);outline:none;transition:border-color .2s,box-shadow .2s;resize:none}
+.segnala-field input:focus,.segnala-field textarea:focus,.segnala-field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(44,94,63,.1)}
+.segnala-field textarea{min-height:90px;line-height:1.5}
+.segnala-actions{display:flex;gap:10px;margin-top:20px}
+.segnala-actions .btn-accent{flex:1;justify-content:center;padding:13px}
+/* ═══ FAB SEGNALA ═══ */
+.fab-segnala{position:fixed;bottom:24px;right:20px;z-index:900;display:flex;align-items:center;gap:8px;background:var(--accent-dark);color:#fff;border:none;border-radius:999px;padding:13px 20px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(28,61,40,.35);transition:transform .2s,box-shadow .2s;white-space:nowrap}
+.fab-segnala:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(28,61,40,.45)}
+.fab-segnala:active{transform:scale(.96)}
 .footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--line);text-align:center;color:var(--soft);font-size:12.5px}
 
 /* ═══ RESPONSIVE ═══ */
@@ -341,6 +368,7 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
   .logo-name{font-size:16px}
   .logo-tag{display:none}
   .logo-mark{width:52px;height:34px}
+  .contatti-grid{grid-template-columns:1fr}
   .dest-grid{grid-template-columns:1fr 1fr}
   .section{margin-top:28px}
   .section-head h2{font-size:22px}
@@ -356,9 +384,13 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
   .mc-imgw{height:180px}
   .macro-card:nth-child(1) .mc-imgw,.macro-card:nth-child(4) .mc-imgw{height:180px}
   .mc-name{font-size:18px}
-  /* filter chips scroll orizzontale */
-  .chips,.season-toggle,.comune-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:none}
-  .chips::-webkit-scrollbar,.season-toggle::-webkit-scrollbar,.comune-chips::-webkit-scrollbar{display:none}
+  /* stagione: scroll orizzontale */
+  .season-toggle{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .season-toggle::-webkit-scrollbar{display:none}
+  /* categorie, prezzi e comuni: wrap su mobile così si vedono tutti */
+  .chips,.comune-chips{flex-wrap:wrap}
+  /* fg non deve espandersi oltre il contenitore */
+  .fg{max-width:100%;overflow:hidden}
   /* edit form */
   .ef-grid{grid-template-columns:1fr}
   .ef-full{grid-column:span 1}
@@ -425,6 +457,55 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
 <nav id="bc" class="breadcrumb container hidden"></nav>
 <main id="app"></main>
 <div id="modalBg" class="modal-bg"></div>
+<button class="fab-segnala" onclick="openSegnala()">
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+  Segnala un luogo
+</button>
+<div id="segnalaOverlay" class="segnala-overlay" onclick="if(event.target===this)closeSegnala()">
+  <div class="segnala-modal" onclick="event.stopPropagation()">
+    <div class="segnala-drag"></div>
+    <div class="segnala-title">📍 Segnala un luogo</div>
+    <div class="segnala-sub">Conosci un posto da non perdere in Valle d'Aosta? Scrivicelo — lo valuteremo per aggiungerlo alla guida.</div>
+    <div class="segnala-field">
+      <label>Nome del luogo *</label>
+      <input type="text" id="sNome" placeholder="es. Trattoria du Bon Coin" maxlength="120">
+    </div>
+    <div class="segnala-field">
+      <label>Località *</label>
+      <input type="text" id="sLocalita" placeholder="es. Courmayeur, Aosta, Cogne…" maxlength="80">
+    </div>
+    <div class="segnala-field">
+      <label>Categoria</label>
+      <select id="sCategoria">
+        <option value="">— Seleziona —</option>
+        <option>Hotel</option>
+        <option>Ristoranti</option>
+        <option>Bar</option>
+        <option>Cocktail bar</option>
+        <option>Gastronomia / Asporto</option>
+        <option>Escursioni</option>
+        <option>Attività</option>
+        <option>Impianti sciistici</option>
+        <option>Altro</option>
+      </select>
+    </div>
+    <div class="segnala-field">
+      <label>Breve descrizione</label>
+      <textarea id="sDesc" placeholder="es. Gastronomia d'asporto locale con prodotti tipici valdostani, ottimi prezzi e porzioni abbondanti…"></textarea>
+    </div>
+    <div class="segnala-field">
+      <label>Il tuo nome (opzionale)</label>
+      <input type="text" id="sMittente" placeholder="es. Marco R." maxlength="60">
+    </div>
+    <div class="segnala-actions">
+      <button class="btn" onclick="closeSegnala()">Annulla</button>
+      <button class="btn btn-accent" onclick="inviaSegnalazione()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Invia segnalazione
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
@@ -637,7 +718,41 @@ function renderHome(){
     ${S.editMode?`<div class="edit-banner">✏️ Modalità Modifica attiva — clicca una scheda per modificarla, poi <strong>Scarica Excel</strong> per salvare tutto<span>💡 Tutte le modifiche rimangono in memoria finché non ricarichi la pagina</span></div>`:""}
     ${vetrinaHTML}
     <section class="section"><div class="section-head"><div><h2>Esplora per area</h2><div class="sub">${S.editMode?"<span style='color:#c0392b;font-weight:700'>✏️ Clicca una macro-area per modificarla</span>":"Seleziona una macro-area per scoprire hotel, ristoranti e attività"}</div></div></div>
-    <div class="macro-grid">${MACRO_AREAS.map((ma,i)=>macroCard(ma,i)).join("")}</div></section>
+    <div class="macro-grid">${MACRO_AREAS.map((ma,i)=>macroCard(ma,i)).join("")}</div>
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn btn-accent" style="padding:12px 28px;font-size:14px;gap:8px" data-action="nav-all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Vedi tutte le ${tp} schede assieme
+      </button>
+    </div></section>
+    <div class="contatti-section">
+      <div class="contatti-grid">
+        <div class="contatti-col">
+          <div class="contatti-label">Azienda</div>
+          <div class="contatti-value">GuidamiVDA SRL</div>
+          <div class="contatti-sub">Sede: Aosta (AO)</div>
+        </div>
+        <div class="contatti-col">
+          <div class="contatti-label">Contatti</div>
+          <a class="contatti-mail" href="mailto:guidamivda@gmail.com">guidamivda@gmail.com</a>
+        </div>
+        <div class="contatti-col">
+          <div class="contatti-label">Collaborazioni</div>
+          <div class="contatti-sub">Per collaborazioni, partnership e inserimento nella guida scrivici a:</div>
+          <a class="contatti-mail" href="mailto:guidamivda@gmail.com">guidamivda@gmail.com</a>
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">Conosci un posto da aggiungere?</div>
+          <div style="font-size:13px;color:var(--soft);margin-top:2px">Segnalaci hotel, ristoranti, attività e luoghi da non perdere.</div>
+        </div>
+        <button class="btn btn-accent" onclick="openSegnala()" style="gap:8px;padding:11px 22px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Segnala un luogo
+        </button>
+      </div>
+    </div>
     <div class="footer"><p>GuidamiVDA \u00b7 Dati: ${esc(S.src)} \u00b7 ${tp} schede in ${ds.length} localit\u00e0</p></div>
   </div>`;bind()}
 
@@ -737,6 +852,36 @@ function openModal(p){
       </div></div></div></div></div>`;
   modalBg.classList.add("open");document.body.style.overflow="hidden"}
 function closeModal(){modalBg.classList.remove("open");modalBg.innerHTML="";document.body.style.overflow=""}
+
+/* ═══ SEGNALA LUOGO ═══ */
+function openSegnala(){
+  document.getElementById("segnalaOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+function closeSegnala(){
+  document.getElementById("segnalaOverlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+function inviaSegnalazione(){
+  const nome=document.getElementById("sNome").value.trim();
+  const localita=document.getElementById("sLocalita").value.trim();
+  const cat=document.getElementById("sCategoria").value;
+  const desc=document.getElementById("sDesc").value.trim();
+  const mittente=document.getElementById("sMittente").value.trim();
+  if(!nome){alert("Inserisci il nome del luogo.");document.getElementById("sNome").focus();return;}
+  if(!localita){alert("Inserisci la località.");document.getElementById("sLocalita").focus();return;}
+  const subject=encodeURIComponent("📍 Segnalazione luogo: "+nome+" ("+localita+")");
+  let body="SEGNALAZIONE NUOVO LUOGO\n";
+  body+="========================\n\n";
+  body+="Nome: "+nome+"\n";
+  body+="Località: "+localita+"\n";
+  if(cat) body+="Categoria: "+cat+"\n";
+  if(desc) body+="\nDescrizione:\n"+desc+"\n";
+  if(mittente) body+="\nSegnalato da: "+mittente+"\n";
+  body+="\n— Inviato tramite GuidamiVDA";
+  window.location.href="mailto:guidamivda@gmail.com?subject="+subject+"&body="+encodeURIComponent(body);
+  setTimeout(closeSegnala, 800);
+}
 
 /* EDIT MODE */
 function toggleEditMode(){
@@ -944,7 +1089,7 @@ function showToast(msg,duration=3500){
 function render(){closeModal();renderBC();if(S.view==="dest")renderDest();else if(S.view==="all")renderAll();else if(S.view==="macro")renderMacro();else renderHome()}
 
 /* BIND */
-function bind(){document.querySelectorAll("[data-action]").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const a=el.getAttribute("data-action"),v=el.getAttribute("data-value");if(a==="set-season"){S.season=v;render()}if(a==="set-cat"){S.cat=v;render()}if(a==="set-price"){S.price=v;render()}if(a==="choose"){nav("dest",v)}if(a==="set-comune"){S.comuneFilter=v;render()}if(a==="open"){openModal(fP(v))}})});setTimeout(initEffects,50);}
+function bind(){document.querySelectorAll("[data-action]").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const a=el.getAttribute("data-action"),v=el.getAttribute("data-value");if(a==="set-season"){S.season=v;render()}if(a==="set-cat"){S.cat=v;render()}if(a==="set-price"){S.price=v;render()}if(a==="choose"){nav("dest",v)}if(a==="set-comune"){S.comuneFilter=v;render()}if(a==="open"){openModal(fP(v))}if(a==="nav-all"){nav("all")}})});setTimeout(initEffects,50);}
 modalBg.addEventListener("click",closeModal);
 
 /* EXCEL UTILS */
