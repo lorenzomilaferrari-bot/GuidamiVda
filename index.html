@@ -342,6 +342,11 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
 .fab-segnala{position:fixed;bottom:24px;right:20px;z-index:900;display:flex;align-items:center;gap:8px;background:var(--accent-dark);color:#fff;border:none;border-radius:999px;padding:13px 20px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(28,61,40,.35);transition:transform .2s,box-shadow .2s;white-space:nowrap}
 .fab-segnala:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(28,61,40,.45)}
 .fab-segnala:active{transform:scale(.96)}
+/* ═══ LANG TOGGLE ═══ */
+.lang-toggle{display:inline-flex;background:rgba(246,244,240,.8);border-radius:999px;padding:3px;border:1px solid var(--line);gap:2px}
+.lang-btn{padding:5px 10px;border-radius:999px;border:none;background:transparent;font-weight:700;font-size:11px;cursor:pointer;color:var(--soft);transition:all .2s var(--ease);letter-spacing:.04em}
+.lang-btn:hover{color:var(--text)}
+.lang-btn.active{background:var(--accent-dark);color:#fff;box-shadow:0 2px 8px rgba(28,61,40,.25)}
 .footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--line);text-align:center;color:var(--soft);font-size:12.5px}
 
 /* ═══ SEZIONE EVENTI ═══ */
@@ -490,19 +495,20 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
       </div>
     </div>
     <div class="toolbar">
-      <label class="btn" for="xlsInput">
+      <div class="lang-toggle"><button class="lang-btn" id="btnIT" onclick="S.lang='it';render()">IT</button><button class="lang-btn" id="btnEN" onclick="S.lang='en';render()">EN</button><button class="lang-btn" id="btnFR" onclick="S.lang='fr';render()">FR</button></div>
+      <label class="btn" id="lblLoadExcel" for="xlsInput">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Carica Excel
+        <span id="txtLoadExcel">Carica Excel</span>
       </label>
       <input id="xlsInput" type="file" accept=".xlsx,.xls" class="hidden"/>
       <button class="btn" onclick="downloadExcel()">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 11V1M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Scarica Excel
+        <span id="txtDownloadExcel">Scarica Excel</span>
       </button>
-      <button id="editModeBtn" class="btn" onclick="toggleEditMode()">&#x270F;&#xFE0F; Modifica</button>
+      <button id="editModeBtn" class="btn" onclick="toggleEditMode()">&#x270F;&#xFE0F; <span id="txtEditBtn">Modifica</span></button>
       <button id="reloadBtn" class="btn btn-ghost">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 8a6 6 0 1 0 .5-2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M2 3v3h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Ricarica
+        <span id="txtReloadBtn">Ricarica</span>
       </button>
     </div>
   </div>
@@ -511,7 +517,7 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
 <nav id="bc" class="breadcrumb container hidden"></nav>
 <main id="app"></main>
 <div id="modalBg" class="modal-bg"></div>
-<button class="fab-segnala" onclick="openSegnala()">
+<button id="fabSegnala" class="fab-segnala" onclick="openSegnala()">
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
   Segnala un luogo
 </button>
@@ -592,13 +598,147 @@ const PH={
 const PC={"\u20ac":"price-1","\u20ac\u20ac":"price-2","\u20ac\u20ac\u20ac":"price-3","\u20ac\u20ac\u20ac\u20ac":"price-4"};
 
 /* STATE */
-let S={data:FALLBACK_DATA,src:"Dataset integrato",view:"home",dest:null,macro:null,cat:"Tutti",price:"Tutte",season:"Entrambi",q:"",comuneFilter:"Tutti",editMode:false,evtMonth:"Tutti",evtComune:"Tutti",evtPrice:"Tutte"};
+let S={data:FALLBACK_DATA,src:"Dataset integrato",view:"home",dest:null,macro:null,cat:"Tutti",price:"Tutte",season:"Entrambi",q:"",comuneFilter:"Tutti",editMode:false,evtMonth:"Tutti",evtComune:"Tutti",evtPrice:"Tutte",lang:"it"};
 const app=document.getElementById("app"),bc=document.getElementById("bc"),modalBg=document.getElementById("modalBg");
 
 /* UTILS */
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slugify=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
 const normH=v=>slugify(v).replace(/-/g,"");
+/* ═══ TRADUZIONI ═══ */
+const LANG={
+  it:{
+    loadExcel:"Carica Excel",downloadExcel:"Scarica Excel",editBtn:"Modifica",reloadBtn:"Ricarica",
+    guideTag:"Guida turistica interattiva",heroTitle:"Scopri la Valle d\u2019Aosta",
+    heroDesc:"Hotel, ristoranti, escursioni, impianti sciistici e attivit\u00e0 \u2014 seleziona una macro-area per iniziare la tua esplorazione.",
+    areas:"Aree",localities:"Localit\u00e0",places:"Luoghi",
+    inVetrina:"In Vetrina",vetrinaSub:"Luoghi selezionati \u00b7 scorri o trascina",vetrinaSubDef:"Alcuni dei luoghi da scoprire",
+    exploreByArea:"Esplora per area",exploreByAreaSub:"Seleziona una macro-area per scoprire hotel, ristoranti e attivit\u00e0",
+    viewAll:"Vedi tutte le {n} schede assieme",
+    comune:"Comune",stagione:"Stagione",categoria:"Categoria",prezzo:"Prezzo",
+    allComuni:"Tutti i comuni",allCat:"Tutti",allPrice:"Tutte",
+    winter:"Inverno",summer:"Estate",both:"Entrambi",
+    searchPlaceholder:"Cerca hotel, ristoranti, escursioni...",searchIn:"Cerca a {dest}",
+    resultsOf:"{n} di {tot} luoghi",resultsArea:"{n} di {tot} luoghi \u00b7 {area}",
+    noResults:"Nessun risultato. Prova a cambiare i filtri.",noResultsAll:"Nessun risultato per i filtri selezionati.",
+    explore:"Scopri",websiteLink:"Sito \u2192",
+    backToList:"\u2190 Torna alla lista",goToSite:"Vai al sito ufficiale \u2192",noSite:"Sito non disponibile",
+    infoBox:"Informazioni",actionsBox:"Azioni",
+    catLabel:"Categoria",zonaLabel:"Zona",stagLabel:"Stagione",prezzoLabel:"Prezzo",localitaLabel:"Localit\u00e0",
+    home:"Home",allLocalities:"Tutte le localit\u00e0",
+    evtBannerEyebrow:"EVENTI IN VALLE D\u2019AOSTA",evtBannerTitle:"Scopri gli eventi in arrivo",
+    evtPageTitle:"Eventi in Valle d\u2019Aosta",evtSub:"{n} eventi \u00b7 seleziona il periodo",
+    evtNext:"Prossimo:",allMonths:"Tutti i mesi",allCommunes:"Tutti i comuni",allPrices:"Tutti i prezzi",
+    evtOf:"{n} di {tot} eventi",evtEmpty:"Nessun evento trovato per i filtri selezionati.",
+    exploreCta:"Esplora \u2192",
+    contattiAzienda:"Azienda",contattiContatti:"Contatti",contattiCollab:"Collaborazioni",
+    contattiSede:"Sede:",contattiCollabText:"Per collaborazioni, partnership e inserimento nella guida scrivici a:",
+    segnalaTeaser:"Conosci un posto da aggiungere?",segnalaTeaserSub:"Segnalaci hotel, ristoranti, attivit\u00e0 e luoghi da non perdere.",
+    segnalaCta:"Segnala un luogo",
+    segnalaTitle:"\uD83D\uDCCD Segnala un luogo",
+    segnalaSub:"Conosci un posto da non perdere in Valle d\u2019Aosta? Scrivicelo \u2014 lo valuteremo per aggiungerlo alla guida.",
+    segnalaNome:"Nome del luogo *",segnalaNomePh:"es. Trattoria du Bon Coin",
+    segnalaLocalita:"Localit\u00e0 *",segnalaLocalitaPh:"es. Courmayeur, Aosta, Cogne\u2026",
+    segnalaCatLabel:"Categoria",segnalaDesc:"Breve descrizione",
+    segnalaDescPh:"es. Gastronomia d\u2019asporto locale con prodotti tipici valdostani\u2026",
+    segnalaMittente:"Il tuo nome (opzionale)",segnalaMittentePh:"es. Marco R.",
+    segnalaAnnulla:"Annulla",segnalaInvia:"Invia segnalazione",
+    footerHome:"GuidamiVDA \u00b7 Dati: {src} \u00b7 {n} schede in {loc} localit\u00e0",
+    footerMacro:"GuidamiVDA \u00b7 {area} \u00b7 Dati: {src}",
+    footerAll:"GuidamiVDA \u00b7 {n} schede totali",
+    footerDest:"GuidamiVDA \u00b7 {dest} \u00b7 Dati: {src}",
+    footerEvt:"GuidamiVDA \u00b7 Eventi \u00b7 {n} in programma",
+    partnerBadge:"Partner",
+  },
+  en:{
+    loadExcel:"Load Excel",downloadExcel:"Download Excel",editBtn:"Edit",reloadBtn:"Reload",
+    guideTag:"Interactive travel guide",heroTitle:"Discover Valle d\u2019Aosta",
+    heroDesc:"Hotels, restaurants, hikes, ski resorts and activities \u2014 select an area to start exploring.",
+    areas:"Areas",localities:"Locations",places:"Places",
+    inVetrina:"Featured",vetrinaSub:"Selected places \u00b7 scroll or drag",vetrinaSubDef:"Some places to discover",
+    exploreByArea:"Explore by area",exploreByAreaSub:"Select an area to discover hotels, restaurants and activities",
+    viewAll:"View all {n} cards together",
+    comune:"Municipality",stagione:"Season",categoria:"Category",prezzo:"Price",
+    allComuni:"All municipalities",allCat:"All",allPrice:"All",
+    winter:"Winter",summer:"Summer",both:"Both",
+    searchPlaceholder:"Search hotels, restaurants, hikes...",searchIn:"Search in {dest}",
+    resultsOf:"{n} of {tot} places",resultsArea:"{n} of {tot} places \u00b7 {area}",
+    noResults:"No results. Try changing the filters.",noResultsAll:"No results for the selected filters.",
+    explore:"Discover",websiteLink:"Website \u2192",
+    backToList:"\u2190 Back to list",goToSite:"Go to official website \u2192",noSite:"Website not available",
+    infoBox:"Information",actionsBox:"Actions",
+    catLabel:"Category",zonaLabel:"Area",stagLabel:"Season",prezzoLabel:"Price",localitaLabel:"Location",
+    home:"Home",allLocalities:"All locations",
+    evtBannerEyebrow:"EVENTS IN VALLE D\u2019AOSTA",evtBannerTitle:"Discover upcoming events",
+    evtPageTitle:"Events in Valle d\u2019Aosta",evtSub:"{n} events \u00b7 select a period",
+    evtNext:"Next:",allMonths:"All months",allCommunes:"All municipalities",allPrices:"All prices",
+    evtOf:"{n} of {tot} events",evtEmpty:"No events found for the selected filters.",
+    exploreCta:"Explore \u2192",
+    contattiAzienda:"Company",contattiContatti:"Contact",contattiCollab:"Partnerships",
+    contattiSede:"HQ:",contattiCollabText:"For partnerships, sponsorships and listings write to:",
+    segnalaTeaser:"Know a place to add?",segnalaTeaserSub:"Suggest hotels, restaurants, activities and must-see spots.",
+    segnalaCta:"Suggest a place",
+    segnalaTitle:"\uD83D\uDCCD Suggest a place",
+    segnalaSub:"Know a must-see spot in Valle d\u2019Aosta? Tell us \u2014 we\u2019ll evaluate it for the guide.",
+    segnalaNome:"Place name *",segnalaNomePh:"e.g. Trattoria du Bon Coin",
+    segnalaLocalita:"Location *",segnalaLocalitaPh:"e.g. Courmayeur, Aosta, Cogne\u2026",
+    segnalaCatLabel:"Category",segnalaDesc:"Brief description",
+    segnalaDescPh:"e.g. Local takeaway with typical Valle d\u2019Aosta products\u2026",
+    segnalaMittente:"Your name (optional)",segnalaMittentePh:"e.g. Marco R.",
+    segnalaAnnulla:"Cancel",segnalaInvia:"Send suggestion",
+    footerHome:"GuidamiVDA \u00b7 Data: {src} \u00b7 {n} cards in {loc} locations",
+    footerMacro:"GuidamiVDA \u00b7 {area} \u00b7 Data: {src}",
+    footerAll:"GuidamiVDA \u00b7 {n} total cards",
+    footerDest:"GuidamiVDA \u00b7 {dest} \u00b7 Data: {src}",
+    footerEvt:"GuidamiVDA \u00b7 Events \u00b7 {n} scheduled",
+    partnerBadge:"Partner",
+  },
+  fr:{
+    loadExcel:"Charger Excel",downloadExcel:"T\u00e9l\u00e9charger Excel",editBtn:"Modifier",reloadBtn:"Recharger",
+    guideTag:"Guide touristique interactif",heroTitle:"D\u00e9couvrez la Vall\u00e9e d\u2019Aoste",
+    heroDesc:"H\u00f4tels, restaurants, randonn\u00e9es, domaines skiables et activit\u00e9s \u2014 s\u00e9lectionnez une zone pour commencer votre exploration.",
+    areas:"Zones",localities:"Localit\u00e9s",places:"Lieux",
+    inVetrina:"En Vitrine",vetrinaSub:"Lieux s\u00e9lectionn\u00e9s \u00b7 d\u00e9filez ou faites glisser",vetrinaSubDef:"Quelques lieux \u00e0 d\u00e9couvrir",
+    exploreByArea:"Explorer par zone",exploreByAreaSub:"S\u00e9lectionnez une zone pour d\u00e9couvrir h\u00f4tels, restaurants et activit\u00e9s",
+    viewAll:"Voir toutes les {n} fiches ensemble",
+    comune:"Commune",stagione:"Saison",categoria:"Cat\u00e9gorie",prezzo:"Prix",
+    allComuni:"Toutes les communes",allCat:"Tous",allPrice:"Tous",
+    winter:"Hiver",summer:"\u00c9t\u00e9",both:"Les deux",
+    searchPlaceholder:"Rechercher h\u00f4tels, restaurants, randonn\u00e9es...",searchIn:"Rechercher \u00e0 {dest}",
+    resultsOf:"{n} sur {tot} lieux",resultsArea:"{n} sur {tot} lieux \u00b7 {area}",
+    noResults:"Aucun r\u00e9sultat. Essayez de modifier les filtres.",noResultsAll:"Aucun r\u00e9sultat pour les filtres s\u00e9lectionn\u00e9s.",
+    explore:"D\u00e9couvrir",websiteLink:"Site \u2192",
+    backToList:"\u2190 Retour \u00e0 la liste",goToSite:"Aller sur le site officiel \u2192",noSite:"Site non disponible",
+    infoBox:"Informations",actionsBox:"Actions",
+    catLabel:"Cat\u00e9gorie",zonaLabel:"Zone",stagLabel:"Saison",prezzoLabel:"Prix",localitaLabel:"Localit\u00e9",
+    home:"Accueil",allLocalities:"Toutes les localit\u00e9s",
+    evtBannerEyebrow:"\u00c9V\u00c9NEMENTS EN VALL\u00c9E D\u2019AOSTE",evtBannerTitle:"D\u00e9couvrez les \u00e9v\u00e9nements \u00e0 venir",
+    evtPageTitle:"\u00c9v\u00e9nements en Vall\u00e9e d\u2019Aoste",evtSub:"{n} \u00e9v\u00e9nements \u00b7 s\u00e9lectionnez une p\u00e9riode",
+    evtNext:"Prochain :",allMonths:"Tous les mois",allCommunes:"Toutes les communes",allPrices:"Tous les prix",
+    evtOf:"{n} sur {tot} \u00e9v\u00e9nements",evtEmpty:"Aucun \u00e9v\u00e9nement trouv\u00e9 pour les filtres s\u00e9lectionn\u00e9s.",
+    exploreCta:"Explorer \u2192",
+    contattiAzienda:"Soci\u00e9t\u00e9",contattiContatti:"Contact",contattiCollab:"Partenariats",
+    contattiSede:"Si\u00e8ge :",contattiCollabText:"Pour les partenariats, parrainages et r\u00e9f\u00e9rencements \u00e9crivez-nous \u00e0 :",
+    segnalaTeaser:"Vous connaissez un endroit \u00e0 ajouter ?",segnalaTeaserSub:"Signalez h\u00f4tels, restaurants, activit\u00e9s et lieux incontournables.",
+    segnalaCta:"Signaler un lieu",
+    segnalaTitle:"\uD83D\uDCCD Signaler un lieu",
+    segnalaSub:"Vous connaissez un lieu incontournable en Vall\u00e9e d\u2019Aoste ? \u00c9crivez-nous \u2014 nous l\u2019\u00e9valuerons pour le guide.",
+    segnalaNome:"Nom du lieu *",segnalaNomePh:"ex. Trattoria du Bon Coin",
+    segnalaLocalita:"Localit\u00e9 *",segnalaLocalitaPh:"ex. Courmayeur, Aoste, Cogne\u2026",
+    segnalaCatLabel:"Cat\u00e9gorie",segnalaDesc:"Br\u00e8ve description",
+    segnalaDescPh:"ex. Restauration rapide locale avec produits typiques valdotains\u2026",
+    segnalaMittente:"Votre nom (optionnel)",segnalaMittentePh:"ex. Marco R.",
+    segnalaAnnulla:"Annuler",segnalaInvia:"Envoyer la suggestion",
+    footerHome:"GuidamiVDA \u00b7 Donn\u00e9es : {src} \u00b7 {n} fiches dans {loc} localit\u00e9s",
+    footerMacro:"GuidamiVDA \u00b7 {area} \u00b7 Donn\u00e9es : {src}",
+    footerAll:"GuidamiVDA \u00b7 {n} fiches au total",
+    footerDest:"GuidamiVDA \u00b7 {dest} \u00b7 Donn\u00e9es : {src}",
+    footerEvt:"GuidamiVDA \u00b7 \u00c9v\u00e9nements \u00b7 {n} au programme",
+    partnerBadge:"Partenaire",
+  }
+};
+const t=k=>(LANG[S.lang]??LANG.it)[k]??LANG.it[k]??k;
+const tf=(k,vars)=>Object.entries(vars||{}).reduce((s,[vk,vv])=>s.replace(`{${vk}}`,vv),t(k));
 /* ── IMAGE CACHE (localStorage per HD, thumbnail compresso per Excel) ── */
 const IMG_NS="guidami_img_v1_";
 function imgCacheSet(key,dataUrl){try{localStorage.setItem(IMG_NS+key,dataUrl);}catch(e){console.warn("Storage pieno, immagine non salvata localmente");}}
@@ -630,8 +770,8 @@ const aD=()=>S.data.destinations||[];
 const gP=s=>(S.data.places||[]).filter(p=>s?p.destination===s:true);
 const fP=s=>(S.data.places||[]).find(p=>p.slug===s);
 const mS=(v,s)=>{v=v||"Entrambi";return s==="Entrambi"||v==="Entrambi"||v===s};
-const isVetrina=p=>{const v=String(p.vetrina??"").toLowerCase().trim();return p.vetrina===true||p.vetrina===1||["1","si","yes","true"].includes(v)};
-const isPartner=p=>{const v=String(p.premium??"").toLowerCase().trim();return p.premium===true||p.premium===1||["1","si","yes","true"].includes(v)};
+const isVetrina=p=>{const v=String(p.vetrina??"").toLowerCase().trim();return p.vetrina===true||p.vetrina===1||["1","s","si","yes","true"].includes(v)};
+const isPartner=p=>{const v=String(p.premium??"").toLowerCase().trim();return p.premium===true||p.premium===1||["1","s","si","yes","true"].includes(v)};
 /* Ordina: premium prima, poi il resto */
 const sortPartner=pp=>[...pp].sort((a,b)=>isPartner(b)-isPartner(a));
 const filter=pp=>{const q=S.q.toLowerCase();const res=pp.filter(p=>p.type!=="Evento"&&(S.cat==="Tutti"||p.type===S.cat)&&(S.price==="Tutte"||p.price===S.price)&&mS(p.season,S.season)&&(!q||p.title.toLowerCase().includes(q)||(p.desc||"").toLowerCase().includes(q)||(p.area||"").toLowerCase().includes(q)||p.type.toLowerCase().includes(q)));return sortPartner(res)};
@@ -663,8 +803,8 @@ function macroPartnerCount(macroId){
 }
 
 /* NAV */
-function snapS(){return{view:S.view,dest:S.dest,macro:S.macro,cat:S.cat,price:S.price,season:S.season,q:S.q,comuneFilter:S.comuneFilter};}
-function restoreS(st){S.view=st.view||"home";S.dest=st.dest||null;S.macro=st.macro||null;S.cat=st.cat||"Tutti";S.price=st.price||"Tutte";S.season=st.season||"Entrambi";S.q=st.q||"";S.comuneFilter=st.comuneFilter||"Tutti";}
+function snapS(){return{view:S.view,dest:S.dest,macro:S.macro,cat:S.cat,price:S.price,season:S.season,q:S.q,comuneFilter:S.comuneFilter,lang:S.lang};}
+function restoreS(st){S.view=st.view||"home";S.dest=st.dest||null;S.macro=st.macro||null;S.cat=st.cat||"Tutti";S.price=st.price||"Tutte";S.season=st.season||"Entrambi";S.q=st.q||"";S.comuneFilter=st.comuneFilter||"Tutti";S.lang=st.lang||"it";}
 function nav(v,sl){
   const go=()=>{
     if(v==="home"){S.view="home";S.dest=null;S.macro=null;S.season="Entrambi";S.q="";S.comuneFilter="Tutti"}
@@ -683,24 +823,24 @@ window.addEventListener("popstate",e=>{if(e.state){restoreS(e.state);render();wi
 function renderBC(){
   if(S.view==="home"){bc.classList.add("hidden");return}
   bc.classList.remove("hidden");
-  let h=`<button onclick="nav('home')">Home</button><span class="sep">›</span>`;
-  if(S.view==="all")h+=`<span class="cur">Tutte le localit\u00e0</span>`;
+  let h=`<button onclick="nav('home')">${t("home")}</button><span class="sep">›</span>`;
+  if(S.view==="all")h+=`<span class="cur">${t("allLocalities")}</span>`;
   else if(S.view==="dest"){const d=gD(S.dest);h+=`<span class="cur">${esc(d?d.name:"")}</span>`}
   else if(S.view==="macro"){const ma=MACRO_AREAS.find(m=>m.id===S.macro);h+=`<span class="cur">${esc(ma?ma.name:"")}</span>`}
-  else if(S.view==="eventi")h+=`<span class="cur">📅 Eventi in Valle d'Aosta</span>`
+  else if(S.view==="eventi")h+=`<span class="cur">📅 ${t("evtPageTitle")}</span>`
   bc.innerHTML=h
 }
 
 /* WIDGETS */
-const seasonBtns=()=>SEASONS.map(v=>{let c=S.season===v?(v==="Inverno"?"active-snow":v==="Estate"?"active-sun":"active"):"";let i=v==="Inverno"?"\u2744\ufe0f ":v==="Estate"?"\u2600\ufe0f ":"\ud83c\udfd4\ufe0f ";return`<button class="sbtn ${c}" data-action="set-season" data-value="${esc(v)}">${i}${esc(v)}</button>`}).join("");
-const catChips=()=>CATS.map(v=>`<button class="chip ${S.cat===v?"active":""}" data-action="set-cat" data-value="${esc(v)}">${v==="Tutti"?"\ud83e\udded ":TE[v]?TE[v]+" ":""}${esc(v)}</button>`).join("");
-const priceChips=()=>PRICES.map(v=>`<button class="chip ${S.price===v?"active":""}" data-action="set-price" data-value="${esc(v)}">${esc(v)}</button>`).join("");
+const seasonBtns=()=>SEASONS.map(v=>{let c=S.season===v?(v==="Inverno"?"active-snow":v==="Estate"?"active-sun":"active"):"";let i=v==="Inverno"?"\u2744\ufe0f ":v==="Estate"?"\u2600\ufe0f ":"\ud83c\udfd4\ufe0f ";const lbl=v==="Inverno"?t("winter"):v==="Estate"?t("summer"):t("both");return`<button class="sbtn ${c}" data-action="set-season" data-value="${esc(v)}">${i}${lbl}</button>`}).join("");
+const catChips=()=>CATS.map(v=>`<button class="chip ${S.cat===v?"active":""}" data-action="set-cat" data-value="${esc(v)}">${v==="Tutti"?"\ud83e\udded ":TE[v]?TE[v]+" ":""}${v==="Tutti"?t("allCat"):esc(v)}</button>`).join("");
+const priceChips=()=>PRICES.map(v=>`<button class="chip ${S.price===v?"active":""}" data-action="set-price" data-value="${esc(v)}">${v==="Tutte"?t("allPrice"):esc(v)}</button>`).join("");
 
 /* DEST CARD */
 function destCard(d,i){
   const n=gP(d.slug).length;
   const editOverlay=S.editMode?`<div class="edit-overlay"><label class="btn btn-sm" title="Cambia immagine" onclick="event.stopPropagation()">&#x1F5BC;&#xFE0F; <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('dest','${esc(d.slug)}',this.files[0])"></label></div>`:"";
-  return`<article class="dest-card" style="animation-delay:${i*.04}s" onclick="nav('dest','${esc(d.slug)}')">    <div class="dc-imgw">${editOverlay}<img class="dc-img" src="${esc(sImg(d.image,'Attivit\u00e0','dest_'+d.slug))}" alt="${esc(d.name)}" loading="lazy" onerror="this.src='${esc(PH['Attivit\u00e0'])}'">    <div class="dc-over"><div class="dc-name">${esc(d.name)}</div><div class="dc-count">${n} luoghi</div></div></div>    <div class="dc-body"><div class="dc-icons">${iPills(d.icons)}</div>    <p class="dc-desc">${esc(d.description)}</p>    <div class="dc-actions"><button class="btn btn-accent" onclick="event.stopPropagation();nav('dest','${esc(d.slug)}')">Esplora \u2192</button>${d.website?`<a class="btn" href="${esc(d.website)}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()">Sito</a>`:""}</div></div></article>`}
+  return`<article class="dest-card" style="animation-delay:${i*.04}s" onclick="nav('dest','${esc(d.slug)}')">    <div class="dc-imgw">${editOverlay}<img class="dc-img" src="${esc(sImg(d.image,'Attivit\u00e0','dest_'+d.slug))}" alt="${esc(d.name)}" loading="lazy" onerror="this.src='${esc(PH['Attivit\u00e0'])}'">    <div class="dc-over"><div class="dc-name">${esc(d.name)}</div><div class="dc-count">${n} luoghi</div></div></div>    <div class="dc-body"><div class="dc-icons">${iPills(d.icons)}</div>    <p class="dc-desc">${esc(d.description)}</p>    <div class="dc-actions"><button class="btn btn-accent" onclick="event.stopPropagation();nav('dest','${esc(d.slug)}')">${t("exploreCta")}</button>${d.website?`<a class="btn" href="${esc(d.website)}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()">${t("websiteLink")}</a>`:""}</div></div></article>`}
 
 /* MACRO CARD */
 function macroCard(ma,i){
@@ -708,12 +848,12 @@ function macroCard(ma,i){
   const nPrem=macroPartnerCount(ma.id);
   const editOverlay=S.editMode?`<div class="edit-overlay"><label class="btn btn-sm" title="Cambia immagine" onclick="event.stopPropagation()">🖼️ <input type="file" accept="image/*" class="hidden" onchange="handleImageUpload('macro','${esc(ma.id)}',this.files[0])"></label></div>`:"";
   const comuniList=getMacroDests(ma.id).map(sl=>{const d=gD(sl);return d?d.name:sl}).filter(Boolean).slice(0,3).join(' · ');
-  const premBadgeMC=nPrem>0?`<div class="mc-prem-badge">★ ${nPrem} Partner</div>`:'';
+  const premBadgeMC=nPrem>0?`<div class="mc-prem-badge">★ ${nPrem} ${t("partnerBadge")}</div>`:'';
   return`<article class="macro-card" style="animation-delay:${i*.07}s;--area-color:${ma.color}" onclick="${S.editMode?`openEditMacro('${esc(ma.id)}')`:`nav('macro','${esc(ma.id)}')`}"><div class="mc-spotlight"></div>
     <div class="mc-imgw">${editOverlay}<img class="mc-img" src="${esc(sImg(ma.image,'Attività','macro_'+ma.id))}" alt="${esc(ma.name)}" loading="lazy" onerror="this.src='${esc(PH['Attività'])}'">
     <div class="mc-over"><div><span class="mc-emoji">${ma.emoji}</span><div class="mc-name" data-scramble="${esc(ma.name)}">${esc(ma.name)}</div>${comuniList?`<div class="mc-comuni">${esc(comuniList)}</div>`:''}</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">${premBadgeMC}<div class="mc-count">${n} luoghi</div></div></div></div>
     <div class="mc-body"><p class="mc-desc">${esc(ma.desc)}</p>
-    <div class="dc-actions" style="margin-top:10px"><button class="btn btn-accent" onclick="event.stopPropagation();${S.editMode?`openEditMacro('${esc(ma.id)}')`:`nav('macro','${esc(ma.id)}')`}">Esplora →</button></div></div></article>`
+    <div class="dc-actions" style="margin-top:10px"><button class="btn btn-accent" onclick="event.stopPropagation();${S.editMode?`openEditMacro('${esc(ma.id)}')`:`nav('macro','${esc(ma.id)}')`}">${t("exploreCta")}</button></div></div></article>`
 }
 
 /* VETRINA CARD */
@@ -725,7 +865,7 @@ function vetrinaCard(p){
       <img class="v-img" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='${esc(sImg('',p.type))}'">
       <div class="v-top-badges">
         <span class="v-type-badge">${TE[p.type]||'📍'} ${esc(p.type)}</span>
-        ${partner?`<span class="v-partner-badge">★ Partner</span>`:''}
+        ${partner?`<span class="v-partner-badge">★ ${t("partnerBadge")}</span>`:''}
       </div>
     </div>
     <div class="v-body">
@@ -743,14 +883,14 @@ function placeCard(p,i){
   const d=gD(p.destination);const dl=Math.min((i||0)*.025,.5);
   const prem=isPartner(p);
   const catClass={'Hotel':'cat-hotel','Ristoranti':'cat-ristoranti','Bar':'cat-bar','Cocktail bar':'cat-cocktail','Escursioni':'cat-escursioni','Attività':'cat-attivita','Impianti sciistici':'cat-impianti'}[p.type]||'';
-  const premBadge=prem?`<div class="premium-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Partner</div>`:"";
+  const premBadge=prem?`<div class="premium-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>${t("partnerBadge")}</div>`:"";
   return`<article class="card ${catClass}${prem?' is-premium':''}" style="animation-delay:${dl}s" onclick="openModal(fP('${esc(p.slug)}'))">
     <div class="c-imgw"><img class="c-img" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='${esc(sImg('',p.type))}'">
     <div class="c-ot"><div class="badge">${TE[p.type]||'📍'} ${esc(p.type)}</div><div style="display:flex;gap:5px;align-items:center">${premBadge}<div class="price ${PC[p.price]||''}">${esc(p.price||'€€')}</div></div></div></div>
-    <div class="c-body"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div class="c-title">${esc(p.title)}</div>${prem?`<div class="premium-badge" style="margin-top:2px;flex-shrink:0"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Partner</div>`:""}</div>
+    <div class="c-body"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px"><div class="c-title">${esc(p.title)}</div>${prem?`<div class="premium-badge" style="margin-top:2px;flex-shrink:0"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>${t("partnerBadge")}</div>`:""}</div>
     <div class="c-area">${esc(d?d.name:p.destination)} · ${esc(p.area||'')}</div>
     <p class="c-desc">${esc(p.desc||'')}</p>
-    <div class="c-actions" onclick="event.stopPropagation()"><button class="btn btn-accent" data-action="open" data-value="${esc(p.slug)}">Scopri</button>${p.website?`<a class="btn" href="${esc(p.website)}" target="_blank" rel="noreferrer">Sito →</a>`:''}</div></div></article>`
+    <div class="c-actions" onclick="event.stopPropagation()"><button class="btn btn-accent" data-action="open" data-value="${esc(p.slug)}">${t("explore")}</button>${p.website?`<a class="btn" href="${esc(p.website)}" target="_blank" rel="noreferrer">${t("websiteLink")}</a>`:''}</div></div></article>`
 }
 
 /* ═══ EVENTI HELPERS ═══ */
@@ -782,15 +922,15 @@ function evtCard(p){
 }
 function evtFiltersHTML(events){
   const availMonths=[...new Set(events.map(e=>fmtEventDate(e.eventDate||"")).filter(f=>f).map(f=>f.monthNum))].sort((a,b)=>a-b);
-  const monthOpts2=[{value:"Tutti",label:"Tutti i mesi",selected:S.evtMonth==="Tutti"},...availMonths.map(m=>({value:String(m),label:MESI[m-1],selected:S.evtMonth==m}))];
+  const monthOpts2=[{value:"Tutti",label:t("allMonths"),selected:S.evtMonth==="Tutti"},...availMonths.map(m=>({value:String(m),label:MESI[m-1],selected:S.evtMonth==m}))];
   const evtDests=[...new Set(events.map(e=>e.destination))];
-  const comuneOpts2=[{value:"Tutti",label:"Tutti i comuni",selected:S.evtComune==="Tutti"},...evtDests.map(sl=>{const d=(S.data.destinations||[]).find(x=>x.slug===sl);return{value:sl,label:d?d.name:sl,selected:S.evtComune===sl};})];
+  const comuneOpts2=[{value:"Tutti",label:t("allCommunes"),selected:S.evtComune==="Tutti"},...evtDests.map(sl=>{const d=(S.data.destinations||[]).find(x=>x.slug===sl);return{value:sl,label:d?d.name:sl,selected:S.evtComune===sl};})];
   const evtPrices=[...new Set(events.map(e=>e.price))];
-  const priceOpts2=[{value:"Tutte",label:"Tutti i prezzi",selected:S.evtPrice==="Tutte"},...evtPrices.map(pr=>({value:pr,label:pr,selected:S.evtPrice===pr}))];
+  const priceOpts2=[{value:"Tutte",label:t("allPrices"),selected:S.evtPrice==="Tutte"},...evtPrices.map(pr=>({value:pr,label:pr,selected:S.evtPrice===pr}))];
   return`<div class="eventi-filters" onclick="event.stopPropagation()" style="margin-top:16px">
-    ${evdDropdown("evd-month",S.evtMonth==="Tutti"?"Tutti i mesi":MESI[parseInt(S.evtMonth)-1],monthOpts2)}
-    ${evdDropdown("evd-comune",S.evtComune==="Tutti"?"Tutti i comuni":((S.data.destinations||[]).find(x=>x.slug===S.evtComune)||{name:S.evtComune}).name,comuneOpts2)}
-    ${evdDropdown("evd-price",S.evtPrice==="Tutte"?"Tutti i prezzi":S.evtPrice,priceOpts2)}
+    ${evdDropdown("evd-month",S.evtMonth==="Tutti"?t("allMonths"):MESI[parseInt(S.evtMonth)-1],monthOpts2)}
+    ${evdDropdown("evd-comune",S.evtComune==="Tutti"?t("allCommunes"):((S.data.destinations||[]).find(x=>x.slug===S.evtComune)||{name:S.evtComune}).name,comuneOpts2)}
+    ${evdDropdown("evd-price",S.evtPrice==="Tutte"?t("allPrices"):S.evtPrice,priceOpts2)}
   </div>`;
 }
 function evtHomeBanner(allPlaces){
@@ -803,10 +943,10 @@ function evtHomeBanner(allPlaces){
       <div class="evt-home-bg"><img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1600&q=80" alt="Eventi"></div>
       <div class="evt-home-overlay"></div>
       <div class="evt-home-content">
-        <div class="evt-home-eyebrow">📅 EVENTI IN VALLE D'AOSTA</div>
-        <div class="evt-home-title">Scopri gli eventi in arrivo</div>
-        <div class="evt-home-sub">${events.length} eventi · ${fd?`Prossimo: ${fd.day} ${fd.month} ${fd.year}`:""}</div>
-        <div class="evt-home-cta">Esplora →</div>
+        <div class="evt-home-eyebrow">📅 ${t("evtBannerEyebrow")}</div>
+        <div class="evt-home-title">${t("evtBannerTitle")}</div>
+        <div class="evt-home-sub">${tf("evtSub",{n:events.length})}${fd?` · ${t("evtNext")} ${fd.day} ${fd.month} ${fd.year}`:""}</div>
+        <div class="evt-home-cta">${t("exploreCta")}</div>
       </div>
     </article>
   </section>`;
@@ -819,19 +959,19 @@ function renderEventi(){
     if(S.evtPrice!=="Tutte"&&e.price!==S.evtPrice)return false;
     return true;
   }).sort((a,b)=>(a.eventDate||"").localeCompare(b.eventDate||""));
-  const cards=filtered.length?filtered.map(evtCard).join(""):`<div class="evt-empty">📅 Nessun evento trovato per i filtri selezionati.</div>`;
+  const cards=filtered.length?filtered.map(evtCard).join(""):`<div class="evt-empty">📅 ${t("evtEmpty")}</div>`;
   app.innerHTML=`<div class="container">
     <div class="eventi-banner">
       <div class="eventi-banner-left">
         <div class="eventi-banner-icon">📅</div>
-        <div><div class="eventi-banner-title">Eventi in Valle d'Aosta</div>
-        <div class="eventi-banner-sub">${events.length} eventi · seleziona il periodo</div></div>
+        <div><div class="eventi-banner-title">${t("evtPageTitle")}</div>
+        <div class="eventi-banner-sub">${tf("evtSub",{n:events.length})}</div></div>
       </div>
       ${evtFiltersHTML(events)}
     </div>
-    <div class="results-info" style="margin-top:12px">${filtered.length} di ${events.length} eventi</div>
+    <div class="results-info" style="margin-top:12px">${tf("evtOf",{n:filtered.length,tot:events.length})}</div>
     <section class="section" style="margin-top:8px"><div class="eventi-grid">${cards}</div></section>
-    <div class="footer"><p>GuidamiVDA · Eventi · ${events.length} in programma</p></div>
+    <div class="footer"><p>${tf("footerEvt",{n:events.length})}</p></div>
   </div>`;bind();
 }
 
@@ -842,57 +982,57 @@ function renderHome(){
   let vetrinaPlaces=allPlaces.filter(isVetrina);
   if(!vetrinaPlaces.length) vetrinaPlaces=allPlaces.slice(0,10);
   const vetrinaCards=vetrinaPlaces.map(p=>vetrinaCard(p)).join("");
-  const vetrinaHTML=vetrinaCards?`<section class="section vetrina-section"><div class="section-head"><div><h2>In Vetrina</h2><div class="sub">${allPlaces.some(isVetrina)?"Luoghi selezionati · scorri o trascina":"Alcuni dei luoghi da scoprire"}</div></div><div class="vetrina-arrows"><button class="vetrina-arrow" id="vArrowL" aria-label="Scorri sinistra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><button class="vetrina-arrow" id="vArrowR" aria-label="Scorri destra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button></div></div><div class="vetrina-track-wrapper"><div class="vetrina-track">${vetrinaCards}${vetrinaCards}</div></div></section>`:"";
+  const vetrinaHTML=vetrinaCards?`<section class="section vetrina-section"><div class="section-head"><div><h2>${t("inVetrina")}</h2><div class="sub">${allPlaces.some(isVetrina)?t("vetrinaSub"):t("vetrinaSubDef")}</div></div><div class="vetrina-arrows"><button class="vetrina-arrow" id="vArrowL" aria-label="Scorri sinistra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button><button class="vetrina-arrow" id="vArrowR" aria-label="Scorri destra"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg></button></div></div><div class="vetrina-track-wrapper"><div class="vetrina-track">${vetrinaCards}${vetrinaCards}</div></div></section>`:"";
 
   app.innerHTML=`<div class="container">
     <div class="hero"><div class="hero-bg"><img src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=1600&q=80" alt="Valle d'Aosta"></div>
     <div class="hero-aurora"><div class="aurora-blob aurora-1"></div><div class="aurora-blob aurora-2"></div><div class="aurora-blob aurora-3"></div></div>
     <div class="hero-content">
-      <div class="hero-eyebrow"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z" fill="currentColor"/></svg> Guida turistica interattiva</div>
-      <h1><span class="hero-gradient-text">Scopri la Valle d'Aosta</span></h1>
-      <p>Hotel, ristoranti, escursioni, impianti sciistici e attivit\u00e0 — seleziona una macro-area per iniziare la tua esplorazione.</p>
-      <div class="hero-stats"><div class="hero-stat"><strong>${MACRO_AREAS.length}</strong>Aree</div><div class="hero-stat"><strong>${ds.length}</strong>Localit\u00e0</div><div class="hero-stat"><strong>${tp}</strong>Luoghi</div></div>
+      <div class="hero-eyebrow"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z" fill="currentColor"/></svg> ${t("guideTag")}</div>
+      <h1><span class="hero-gradient-text">${t("heroTitle")}</span></h1>
+      <p>${t("heroDesc")}</p>
+      <div class="hero-stats"><div class="hero-stat"><strong>${MACRO_AREAS.length}</strong>${t("areas")}</div><div class="hero-stat"><strong>${ds.length}</strong>${t("localities")}</div><div class="hero-stat"><strong>${tp}</strong>${t("places")}</div></div>
     </div></div>
     ${S.editMode?`<div class="edit-banner">✏️ Modalità Modifica attiva — clicca una scheda per modificarla, poi <strong>Scarica Excel</strong> per salvare tutto<span>💡 Tutte le modifiche rimangono in memoria finché non ricarichi la pagina</span></div>`:""}
     ${vetrinaHTML}
     ${evtHomeBanner(allPlaces)}
-    <section class="section"><div class="section-head"><div><h2>Esplora per area</h2><div class="sub">${S.editMode?"<span style='color:#c0392b;font-weight:700'>✏️ Clicca una macro-area per modificarla</span>":"Seleziona una macro-area per scoprire hotel, ristoranti e attività"}</div></div></div>
+    <section class="section"><div class="section-head"><div><h2>${t("exploreByArea")}</h2><div class="sub">${S.editMode?"<span style='color:#c0392b;font-weight:700'>✏️ Clicca una macro-area per modificarla</span>":t("exploreByAreaSub")}</div></div></div>
     <div class="macro-grid">${MACRO_AREAS.map((ma,i)=>macroCard(ma,i)).join("")}</div>
     <div style="text-align:center;margin-top:20px">
       <button class="btn btn-accent" style="padding:12px 28px;font-size:14px;gap:8px" data-action="nav-all">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Vedi tutte le ${tp} schede assieme
+        ${tf("viewAll",{n:tp})}
       </button>
     </div></section>
     <div class="contatti-section">
       <div class="contatti-grid">
         <div class="contatti-col">
-          <div class="contatti-label">Azienda</div>
+          <div class="contatti-label">${t("contattiAzienda")}</div>
           <div class="contatti-value">GuidamiVDA SRL</div>
-          <div class="contatti-sub">Sede: Aosta (AO)</div>
+          <div class="contatti-sub">${t("contattiSede")} Aosta (AO)</div>
         </div>
         <div class="contatti-col">
-          <div class="contatti-label">Contatti</div>
+          <div class="contatti-label">${t("contattiContatti")}</div>
           <a class="contatti-mail" href="mailto:guidamivda@gmail.com">guidamivda@gmail.com</a>
         </div>
         <div class="contatti-col">
-          <div class="contatti-label">Collaborazioni</div>
-          <div class="contatti-sub">Per collaborazioni, partnership e inserimento nella guida scrivici a:</div>
+          <div class="contatti-label">${t("contattiCollab")}</div>
+          <div class="contatti-sub">${t("contattiCollabText")}</div>
           <a class="contatti-mail" href="mailto:guidamivda@gmail.com">guidamivda@gmail.com</a>
         </div>
       </div>
       <div style="margin-top:24px;padding-top:24px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text)">Conosci un posto da aggiungere?</div>
-          <div style="font-size:13px;color:var(--soft);margin-top:2px">Segnalaci hotel, ristoranti, attività e luoghi da non perdere.</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)">${t("segnalaTeaser")}</div>
+          <div style="font-size:13px;color:var(--soft);margin-top:2px">${t("segnalaTeaserSub")}</div>
         </div>
         <button class="btn btn-accent" onclick="openSegnala()" style="gap:8px;padding:11px 22px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          Segnala un luogo
+          ${t("segnalaCta")}
         </button>
       </div>
     </div>
-    <div class="footer"><p>GuidamiVDA \u00b7 Dati: ${esc(S.src)} \u00b7 ${tp} schede in ${ds.length} localit\u00e0</p></div>
+    <div class="footer"><p>${tf("footerHome",{src:S.src,n:tp,loc:ds.length})}</p></div>
   </div>`;bind()}
 
 /* MACRO PAGE */
@@ -904,7 +1044,7 @@ function renderMacro(){
   const pp=filterMacro(allPlaces);
   const destSlugs=[...new Set(allPlaces.map(p=>p.destination))];
   const comuneChips=[
-    `<button class="comune-chip ${S.comuneFilter==='Tutti'?'active':''}" data-action="set-comune" data-value="Tutti">🗺️ Tutti i comuni<span class="cc-count">${allPlaces.length}</span></button>`,
+    `<button class="comune-chip ${S.comuneFilter==='Tutti'?'active':''}" data-action="set-comune" data-value="Tutti">🗺️ ${t("allComuni")}<span class="cc-count">${allPlaces.length}</span></button>`,
     ...destSlugs.map(sl=>{const d=gD(sl);const nm=d?d.name:sl;const n=allPlaces.filter(p=>p.destination===sl).length;return`<button class="comune-chip ${S.comuneFilter===sl?'active':''}" data-action="set-comune" data-value="${esc(sl)}">📍 ${esc(nm)}<span class="cc-count">${n}</span></button>`})
   ].join("");
   app.innerHTML=`<div class="container">
@@ -918,14 +1058,14 @@ function renderMacro(){
     ${S.editMode?`<div class="edit-banner">✏️ Clicca una scheda per modificarne nome, prezzo, descrizione, foto e altro <span>Poi vai su <strong>Scarica Excel</strong> per salvare tutto</span></div>`:""}
 
     <div class="filter-bar">
-      <div style="width:100%"><div class="fl">📍 Comune</div><div class="comune-chips">${comuneChips}</div></div>
-      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
-      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
-      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+      <div style="width:100%"><div class="fl">📍 ${t("comune")}</div><div class="comune-chips">${comuneChips}</div></div>
+      <div class="fg"><div class="fl">${t("stagione")}</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">${t("categoria")}</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">${t("prezzo")}</div><div class="chips">${priceChips()}</div></div>
     </div>
-    <div class="results-info">${pp.length} di ${allPlaces.length} luoghi \u00b7 ${esc(ma.name)}</div>
-    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato. Prova a cambiare i filtri.</div>`}</div></section>
-    <div class="footer"><p>GuidamiVDA \u00b7 ${esc(ma.name)} \u00b7 Dati: ${esc(S.src)}</p></div>
+    <div class="results-info">${tf("resultsArea",{n:pp.length,tot:allPlaces.length,area:esc(ma.name)})}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>${t("noResults")}</div>`}</div></section>
+    <div class="footer"><p>${tf("footerMacro",{area:esc(ma.name),src:esc(S.src)})}</p></div>
   </div>`;bind()}
 
 /* ALL */
@@ -933,14 +1073,14 @@ function renderAll(){
   const pp=filter(gP(null));
   app.innerHTML=`<div class="container">
     <div class="filter-bar">
-      <div class="fg fg-wide"><div class="fl">Cerca</div><input class="search-input" type="text" placeholder="Cerca hotel, ristoranti, escursioni..." value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
-      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
-      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
-      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+      <div class="fg fg-wide"><div class="fl">${t("searchPlaceholder")}</div><input class="search-input" type="text" placeholder="${t("searchPlaceholder")}" value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
+      <div class="fg"><div class="fl">${t("stagione")}</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">${t("categoria")}</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">${t("prezzo")}</div><div class="chips">${priceChips()}</div></div>
     </div>
-    <div class="results-info">${pp.length} risultati \u00b7 ${esc(S.cat)} \u00b7 ${esc(S.price==="Tutte"?"Tutte le fasce":S.price)} \u00b7 ${esc(S.season)}</div>
-    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato per i filtri selezionati.</div>`}</div></section>
-    <div class="footer"><p>GuidamiVDA \u00b7 ${(S.data.places||[]).length} schede totali</p></div>
+    <div class="results-info">${tf("resultsOf",{n:pp.length,tot:(S.data.places||[]).length})}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>${t("noResultsAll")}</div>`}</div></section>
+    <div class="footer"><p>${tf("footerAll",{n:(S.data.places||[]).length})}</p></div>
   </div>`;bind();focusSearch()}
 
 /* DEST PAGE */
@@ -956,14 +1096,14 @@ function renderDest(){
       ${d.website?`<div class="dest-hero-link"><a href="${esc(d.website)}" target="_blank" rel="noreferrer">Sito ufficiale \u2192</a></div>`:""}
     </div></div>
     <div class="filter-bar">
-      <div class="fg fg-wide"><div class="fl">Cerca a ${esc(d.name)}</div><input class="search-input" type="text" placeholder="Cerca hotel, ristoranti, escursioni..." value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
-      <div class="fg"><div class="fl">Stagione</div><div class="season-toggle">${seasonBtns()}</div></div>
-      <div class="fg"><div class="fl">Categoria</div><div class="chips">${catChips()}</div></div>
-      <div class="fg"><div class="fl">Prezzo</div><div class="chips">${priceChips()}</div></div>
+      <div class="fg fg-wide"><div class="fl">${tf("searchIn",{dest:esc(d.name)})}</div><input class="search-input" type="text" placeholder="${t("searchPlaceholder")}" value="${esc(S.q)}" oninput="S.q=this.value;render()"></div>
+      <div class="fg"><div class="fl">${t("stagione")}</div><div class="season-toggle">${seasonBtns()}</div></div>
+      <div class="fg"><div class="fl">${t("categoria")}</div><div class="chips">${catChips()}</div></div>
+      <div class="fg"><div class="fl">${t("prezzo")}</div><div class="chips">${priceChips()}</div></div>
     </div>
-    <div class="results-info">${pp.length} di ${all.length} luoghi a ${esc(d.name)}</div>
-    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>Nessun risultato. Prova a cambiare i filtri.</div>`}</div></section>
-    <div class="footer"><p>GuidamiVDA \u00b7 ${esc(d.name)} \u00b7 Dati: ${esc(S.src)}</p></div>
+    <div class="results-info">${tf("resultsOf",{n:pp.length,tot:all.length})}</div>
+    <section class="section" style="margin-top:8px"><div class="cards-grid">${pp.length?pp.map((p,i)=>placeCard(p,i)).join(""):`<div class="empty"><div class="empty-icon">&#x1F50D;</div>${t("noResults")}</div>`}</div></section>
+    <div class="footer"><p>${tf("footerDest",{dest:esc(d.name),src:esc(S.src)})}</p></div>
   </div>`;bind();focusSearch()}
 
 function focusSearch(){const si=document.querySelector(".search-input");if(si&&S.q){si.focus();si.setSelectionRange(si.value.length,si.value.length)}}
@@ -978,23 +1118,40 @@ function openModal(p){
     <div class="m-imgw"><img id="modalImg" src="${esc(sImg(p.image,p.type,'place_'+p.slug))}" alt="${esc(p.title)}" onerror="this.src='${esc(sImg('',p.type))}'">    <button class="close-btn" onclick="closeModal()">&#x2715;</button>    <div class="m-over"><div><div class="m-title">${esc(p.title)}</div><div class="m-sub">${esc(d?d.name:p.destination)} \u00b7 ${esc(p.area||"")}</div></div>    <div class="price ${PC[p.price]||""}" style="flex-shrink:0;font-size:13px">${esc(p.price)}</div></div></div>
     <p class="m-desc" id="modalDesc">${esc(p.desc||"")}</p>
     ${editBtn}
-    <div class="m-grid"><div class="info-box"><div class="info-box-label">Informazioni</div>
-      <div class="info-row"><strong>Categoria</strong>${TE[p.type]||""} ${esc(p.type)}</div>
-      <div class="info-row"><strong>Zona</strong>${esc(p.area||"—")}</div>
-      <div class="info-row"><strong>Stagione</strong>${esc(p.season||"Entrambi")}</div>
-      <div class="info-row"><strong>Prezzo</strong>${esc(p.price||"—")}</div>
-      <div class="info-row"><strong>Localit\u00e0</strong>${esc(d?d.name:p.destination)}</div>
-    </div><div class="info-box"><div class="info-box-label">Azioni</div>
+    <div class="m-grid"><div class="info-box"><div class="info-box-label">${t("infoBox")}</div>
+      <div class="info-row"><strong>${t("catLabel")}</strong>${TE[p.type]||""} ${esc(p.type)}</div>
+      <div class="info-row"><strong>${t("zonaLabel")}</strong>${esc(p.area||"—")}</div>
+      <div class="info-row"><strong>${t("stagLabel")}</strong>${esc(p.season||"Entrambi")}</div>
+      <div class="info-row"><strong>${t("prezzoLabel")}</strong>${esc(p.price||"—")}</div>
+      <div class="info-row"><strong>${t("localitaLabel")}</strong>${esc(d?d.name:p.destination)}</div>
+    </div><div class="info-box"><div class="info-box-label">${t("actionsBox")}</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        ${p.website?`<a class="btn btn-accent" href="${esc(p.website)}" target="_blank" rel="noreferrer" style="justify-content:center">Vai al sito ufficiale \u2192</a>`:`<span style="color:var(--soft);font-size:13px">Sito non disponibile</span>`}
-        <button class="btn" onclick="closeModal()" style="justify-content:center">\u2190 Torna alla lista</button>
+        ${p.website?`<a class="btn btn-accent" href="${esc(p.website)}" target="_blank" rel="noreferrer" style="justify-content:center">${t("goToSite")}</a>`:`<span style="color:var(--soft);font-size:13px">${t("noSite")}</span>`}
+        <button class="btn" onclick="closeModal()" style="justify-content:center">${t("backToList")}</button>
       </div></div></div></div></div>`;
   modalBg.classList.add("open");document.body.style.overflow="hidden"}
 function closeModal(){modalBg.classList.remove("open");modalBg.innerHTML="";document.body.style.overflow=""}
 
 /* ═══ SEGNALA LUOGO ═══ */
 function openSegnala(){
-  document.getElementById("segnalaOverlay").classList.add("open");
+  const ov=document.getElementById("segnalaOverlay");
+  const m=ov.querySelector('.segnala-modal');
+  if(m){
+    m.querySelector('.segnala-title').textContent=t("segnalaTitle");
+    m.querySelector('.segnala-sub').textContent=t("segnalaSub");
+    const labels=m.querySelectorAll('.segnala-field label');
+    const labelKeys=["segnalaNome","segnalaLocalita","segnalaCatLabel","segnalaDesc","segnalaMittente"];
+    labels.forEach((el,i)=>{if(labelKeys[i])el.textContent=t(labelKeys[i]);});
+    const inputs=[m.querySelector('#sNome'),m.querySelector('#sLocalita'),m.querySelector('#sDesc'),m.querySelector('#sMittente')];
+    const phKeys=["segnalaNomePh","segnalaLocalitaPh","segnalaDescPh","segnalaMittentePh"];
+    inputs.forEach((el,i)=>{if(el&&phKeys[i])el.placeholder=t(phKeys[i]);});
+    const actions=m.querySelectorAll('.segnala-actions button');
+    if(actions[0])actions[0].textContent=t("segnalaAnnulla");
+    if(actions[1]){const svg=actions[1].querySelector('svg');actions[1].textContent=t("segnalaInvia");if(svg)actions[1].insertBefore(svg,actions[1].firstChild);}
+  }
+  const fab=document.getElementById('fabSegnala');
+  if(fab&&fab.lastChild&&fab.lastChild.nodeType===3)fab.lastChild.textContent=' '+t("segnalaCta");
+  ov.classList.add("open");
   document.body.style.overflow="hidden";
 }
 /* ═══ EVD DROPDOWN ═══ */
@@ -1133,14 +1290,14 @@ function openEditModal(p){
         <div class="ef-field ef-full">
           <label class="ef-label">⭐ Vetrina</label>
           <label class="ef-checkbox-row">
-            <input type="checkbox" ${isVetrina(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','vetrina',this.checked?'1':'0')">
+            <input type="checkbox" ${isVetrina(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','vetrina',this.checked?'S':'N')">
             <span>Mostra questo luogo nella vetrina della home page</span>
           </label>
         </div>
         <div class="ef-field ef-full">
           <label class="ef-label" style="color:#b8860b">👑 Partner</label>
           <label class="ef-checkbox-row" style="border-color:rgba(201,160,51,.4);background:rgba(253,248,236,.6)">
-            <input type="checkbox" ${isPartner(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','premium',this.checked?'1':'0')">
+            <input type="checkbox" ${isPartner(p)?"checked":""} onchange="updateField('place','${esc(p.slug)}','premium',this.checked?'S':'N')">
             <span>Scheda <strong>Partner</strong> — appare sempre per prima negli elenchi con badge dorato</span>
           </label>
         </div>
@@ -1241,7 +1398,7 @@ function showToast(msg,duration=3500){
   clearTimeout(_toastTimer);
   _toastTimer=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateX(-50%) translateY(20px)";},duration);
 }
-function render(){closeModal();renderBC();if(S.view==="dest")renderDest();else if(S.view==="all")renderAll();else if(S.view==="macro")renderMacro();else if(S.view==="eventi")renderEventi();else renderHome()}
+function render(){closeModal();renderBC();if(S.view==="dest")renderDest();else if(S.view==="all")renderAll();else if(S.view==="macro")renderMacro();else if(S.view==="eventi")renderEventi();else renderHome();['IT','EN','FR'].forEach(l=>{const b=document.getElementById('btn'+l);if(b)b.classList.toggle('active',S.lang===l.toLowerCase());});const fab=document.getElementById('fabSegnala');if(fab&&fab.lastChild&&fab.lastChild.nodeType===3)fab.lastChild.textContent=' '+t("segnalaCta");const _u=(id,k)=>{const el=document.getElementById(id);if(el)el.textContent=t(k);};_u('txtLoadExcel','loadExcel');_u('txtDownloadExcel','downloadExcel');_u('txtEditBtn','editBtn');_u('txtReloadBtn','reloadBtn');}
 
 /* BIND */
 function bind(){document.querySelectorAll("[data-action]").forEach(el=>{el.addEventListener("click",e=>{e.stopPropagation();const a=el.getAttribute("data-action"),v=el.getAttribute("data-value");if(a==="set-season"){S.season=v;render()}if(a==="set-cat"){S.cat=v;render()}if(a==="set-price"){S.price=v;render()}if(a==="choose"){nav("dest",v)}if(a==="set-comune"){S.comuneFilter=v;render()}if(a==="open"){openModal(fP(v))}if(a==="nav-all"){nav("all")}})});setTimeout(initEffects,50);}
@@ -1263,7 +1420,7 @@ function parseWB(wb){
   const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});const h={};(rows[0]||[]).forEach((v,i)=>h[normH(v)]=i);
   const pp=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
     slug:slugify(valAt(r,h,["nomeluogo","nome","title"])),
-    destination:macroareaToDestSlug(valAt(r,h,["macroarea","localita","sluglocalita"])),
+    destination:(()=>{const comune=String(valAt(r,h,["comune","localita","sluglocalita"])||"").trim();if(comune){const slug=slugify(comune);const found=(FALLBACK_DATA.destinations||[]).find(d=>d.slug===slug||slugify(d.name)===slug);if(found)return found.slug;if(slug)return slug;}return macroareaToDestSlug(valAt(r,h,["macroarea"]));})(),
     title:String(valAt(r,h,["nomeluogo","nome","title"])||"").trim(),
     type:String(valAt(r,h,["tipo","categoria","type","category"])||"Attivit\u00e0").trim(),
     area:String(valAt(r,h,["zona","area"])||"").trim(),
@@ -1302,12 +1459,13 @@ function downloadExcel(){
   if(typeof XLSX==="undefined"){alert("Libreria XLSX non disponibile.");return}
   try{
     const wb=XLSX.utils.book_new();
-    const luoghiHeaders=["Nome Luogo","Macroarea","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner","Data Evento"];
+    const luoghiHeaders=["Nome Luogo","Macroarea","Comune","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner","Data Evento"];
     const luoghiRows=(S.data.places||[]).map(p=>{
       const ma=MACRO_AREAS.find(m=>m.dests.includes(p.destination));
-      return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(p.type),safeCell(p.area),
-        safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
-        safeImg(p.image),isVetrina(p)?"1":"0",isPartner(p)?"1":"0",safeCell(p.eventDate||"")];
+      const dest=(S.data.destinations||[]).find(d=>d.slug===p.destination);
+      return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(dest?dest.name:p.destination),
+        safeCell(p.type),safeCell(p.area),safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+        safeImg(p.image),isVetrina(p)?"S":"N",isPartner(p)?"S":"N",safeCell(p.eventDate||"")];
     });
     const wsL=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows]);
     XLSX.utils.book_append_sheet(wb,wsL,"Luoghi");
@@ -1322,13 +1480,14 @@ function downloadExcel(){
     console.warn("Download Excel fallito (prob. immagini troppo grandi), ritento senza immagini:",err);
     try{
       const wb2=XLSX.utils.book_new();
-      const luoghiHeaders=["Nome Luogo","Macroarea","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner","Data Evento"];
+      const luoghiHeaders=["Nome Luogo","Macroarea","Comune","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner","Data Evento"];
       const luoghiRows2=(S.data.places||[]).map(p=>{
         const ma=MACRO_AREAS.find(m=>m.dests.includes(p.destination));
-        return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(p.type),safeCell(p.area),
-          safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+        const dest=(S.data.destinations||[]).find(d=>d.slug===p.destination);
+        return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(dest?dest.name:p.destination),
+          safeCell(p.type),safeCell(p.area),safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
           String(p.image||"").startsWith("data:")?"":safeCell(p.image),
-          isVetrina(p)?"1":"0",isPartner(p)?"1":"0",safeCell(p.eventDate||"")];
+          isVetrina(p)?"S":"N",isPartner(p)?"S":"N",safeCell(p.eventDate||"")];
       });
       const wsL2=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows2]);
       XLSX.utils.book_append_sheet(wb2,wsL2,"Luoghi");
