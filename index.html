@@ -1095,12 +1095,20 @@ modalBg.addEventListener("click",closeModal);
 /* EXCEL UTILS */
 function valAt(r,m,ks){for(const k of ks)if(m[k]!==undefined)return r[m[k]];return""}
 function deriveDests(pp){const fb=new Map((FALLBACK_DATA.destinations||[]).map(d=>[d.slug,d]));return[...new Set(pp.map(p=>p.destination).filter(Boolean))].map(s=>fb.get(s)||{slug:s,name:s.replace(/-/g," ").replace(/\b\w/g,m=>m.toUpperCase()),seasonality:"Entrambi",description:"",icons:"paese",image:"",website:""})}
+function macroareaToDestSlug(val){
+  /* Mappa un nome/id macroarea → slug prima destinazione di quell'area */
+  const norm=slugify(val||"");
+  const ma=MACRO_AREAS.find(m=>slugify(m.id)===norm||slugify(m.name)===norm);
+  if(ma&&ma.dests&&ma.dests.length)return ma.dests[0];
+  /* fallback: tratta il valore come slug destinazione diretto */
+  return norm||"courmayeur";
+}
 function parseWB(wb){
   const ws=wb.Sheets["Luoghi"];if(!ws)throw new Error("Manca il foglio 'Luoghi'.");
   const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});const h={};(rows[0]||[]).forEach((v,i)=>h[normH(v)]=i);
   const pp=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
     slug:slugify(valAt(r,h,["nomeluogo","nome","title"])),
-    destination:slugify(valAt(r,h,["localita","sluglocalita"]))||"courmayeur",
+    destination:macroareaToDestSlug(valAt(r,h,["macroarea","localita","sluglocalita"])),
     title:String(valAt(r,h,["nomeluogo","nome","title"])||"").trim(),
     type:String(valAt(r,h,["tipo","categoria","type","category"])||"Attivit\u00e0").trim(),
     area:String(valAt(r,h,["zona","area"])||"").trim(),
@@ -1110,21 +1118,10 @@ function parseWB(wb){
     website:String(valAt(r,h,["sitoweb","website","link"])||"").trim(),
     image:String(valAt(r,h,["urlfotoopz","urlfoto","image","imageurl"])||"").trim(),
     vetrina:["1","si","yes","true"].includes(String(valAt(r,h,["invetrina","vetrina","featured"])||"").toLowerCase().trim()),
-    premium:["1","si","yes","true"].includes(String(valAt(r,h,["premium","inevidenza","evidenza","top","sponsored"])||"").toLowerCase().trim()),
+    premium:["1","si","yes","true"].includes(String(valAt(r,h,["partner","premium","inevidenza","evidenza","top","sponsored"])||"").toLowerCase().trim()),
   }));
-  const wd=wb.Sheets["Destinazioni"];let ds=[];
-  if(wd){const dr=XLSX.utils.sheet_to_json(wd,{header:1,defval:""});const dh={};(dr[0]||[]).forEach((v,i)=>dh[normH(v)]=i);
-    ds=dr.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
-      slug:slugify(valAt(r,dh,["sluglocalita","localita","slug"])),
-      name:String(valAt(r,dh,["nomelocalita","name"])||"").trim(),
-      seasonality:String(valAt(r,dh,["stagione","season"])||"Entrambi").trim(),
-      description:String(valAt(r,dh,["descrizionebreve","description"])||"").trim(),
-      icons:String(valAt(r,dh,["iconelocalita","icons"])||"paese").trim(),
-      image:String(valAt(r,dh,["urlfotolocalita","image"])||"").trim(),
-      website:String(valAt(r,dh,["sitolocalita","website"])||"").trim(),
-      macroarea:String(valAt(r,dh,["macroarea","area","macro"])||"").trim(),
-    })).filter(d=>d.slug)}
-  if(!ds.length)ds=deriveDests(pp);
+  /* foglio Macroaree (nuovo) o Destinazioni (retrocompat) — non modifichiamo le destinazioni interne */
+  let ds=deriveDests(pp);
   const fm=new Map((FALLBACK_DATA.destinations||[]).map(d=>[d.slug,d]));
   ds=ds.map(d=>{const fb=fm.get(d.slug)||{};return{...fb,...d,name:d.name||fb.name||d.slug,description:d.description||fb.description||"",icons:d.icons||fb.icons||"paese",image:d.image||fb.image||"",website:d.website||fb.website||""}});
   ds.forEach(d=>{
@@ -1149,22 +1146,19 @@ function downloadExcel(){
   if(typeof XLSX==="undefined"){alert("Libreria XLSX non disponibile.");return}
   try{
     const wb=XLSX.utils.book_new();
-    const luoghiHeaders=["Nome Luogo","Localita","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
-    const luoghiRows=(S.data.places||[]).map(p=>[
-      safeCell(p.title),safeCell(p.destination),safeCell(p.type),safeCell(p.area),
-      safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
-      safeImg(p.image),isVetrina(p)?"1":"0",isPartner(p)?"1":"0"
-    ]);
+    const luoghiHeaders=["Nome Luogo","Macroarea","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
+    const luoghiRows=(S.data.places||[]).map(p=>{
+      const ma=MACRO_AREAS.find(m=>m.dests.includes(p.destination));
+      return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(p.type),safeCell(p.area),
+        safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+        safeImg(p.image),isVetrina(p)?"1":"0",isPartner(p)?"1":"0"];
+    });
     const wsL=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows]);
     XLSX.utils.book_append_sheet(wb,wsL,"Luoghi");
-    const destHeaders=["Slug Localita","Nome Localita","Stagione","Descrizione Breve","Icone Localita","URL Foto Localita","Sito Localita","Macroarea"];
-    const destRows=(S.data.destinations||[]).map(d=>{
-      const ma=MACRO_AREAS.find(m=>m.dests.includes(d.slug));
-      return[safeCell(d.slug),safeCell(d.name),safeCell(d.seasonality),safeCell(d.description),
-             safeCell(d.icons),safeImg(d.image),safeCell(d.website),ma?ma.id:""];
-    });
-    const wsD=XLSX.utils.aoa_to_sheet([destHeaders,...destRows]);
-    XLSX.utils.book_append_sheet(wb,wsD,"Destinazioni");
+    const macroHeaders=["ID Macroarea","Nome Macroarea","Descrizione","URL Foto","Localita incluse"];
+    const macroRows=MACRO_AREAS.map(ma=>[safeCell(ma.id),safeCell(ma.name),safeCell(ma.desc),safeCell(ma.image),safeCell((ma.dests||[]).join(", "))]);
+    const wsMa=XLSX.utils.aoa_to_sheet([macroHeaders,...macroRows]);
+    XLSX.utils.book_append_sheet(wb,wsMa,"Macroaree");
     XLSX.writeFile(wb,"GuidamiVDA_export.xlsx");
     showToast("✅ Excel scaricato! Le immagini caricate sono incluse se compresse.");
   }catch(err){
@@ -1172,23 +1166,20 @@ function downloadExcel(){
     console.warn("Download Excel fallito (prob. immagini troppo grandi), ritento senza immagini:",err);
     try{
       const wb2=XLSX.utils.book_new();
-      const luoghiHeaders=["Nome Luogo","Localita","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
-      const luoghiRows2=(S.data.places||[]).map(p=>[
-        safeCell(p.title),safeCell(p.destination),safeCell(p.type),safeCell(p.area),
-        safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
-        String(p.image||"").startsWith("data:")?"":safeCell(p.image)/* URL esterna ok */,
-        isVetrina(p)?"1":"0",isPartner(p)?"1":"0"
-      ]);
+      const luoghiHeaders=["Nome Luogo","Macroarea","Tipo","Zona","Fascia Prezzo","Stagione","Descrizione","Sito Web","URL Foto (opz)","In Vetrina","Partner"];
+      const luoghiRows2=(S.data.places||[]).map(p=>{
+        const ma=MACRO_AREAS.find(m=>m.dests.includes(p.destination));
+        return[safeCell(p.title),safeCell(ma?ma.name:p.destination),safeCell(p.type),safeCell(p.area),
+          safeCell(p.price),safeCell(p.season),safeCell(p.desc),safeCell(p.website),
+          String(p.image||"").startsWith("data:")?"":safeCell(p.image),
+          isVetrina(p)?"1":"0",isPartner(p)?"1":"0"];
+      });
       const wsL2=XLSX.utils.aoa_to_sheet([luoghiHeaders,...luoghiRows2]);
       XLSX.utils.book_append_sheet(wb2,wsL2,"Luoghi");
-      const destHeaders=["Slug Localita","Nome Localita","Stagione","Descrizione Breve","Icone Localita","URL Foto Localita","Sito Localita","Macroarea"];
-      const destRows2=(S.data.destinations||[]).map(d=>{
-        const ma=MACRO_AREAS.find(m=>m.dests.includes(d.slug));
-        return[safeCell(d.slug),safeCell(d.name),safeCell(d.seasonality),safeCell(d.description),
-               safeCell(d.icons),String(d.image||"").startsWith("data:")?"":safeCell(d.image),safeCell(d.website),ma?ma.id:""];
-      });
-      const wsD2=XLSX.utils.aoa_to_sheet([destHeaders,...destRows2]);
-      XLSX.utils.book_append_sheet(wb2,wsD2,"Destinazioni");
+      const macroHeaders2=["ID Macroarea","Nome Macroarea","Descrizione","URL Foto","Localita incluse"];
+      const macroRows2=MACRO_AREAS.map(ma=>[safeCell(ma.id),safeCell(ma.name),safeCell(ma.desc),safeCell(ma.image),safeCell((ma.dests||[]).join(", "))]);
+      const wsMa2=XLSX.utils.aoa_to_sheet([macroHeaders2,...macroRows2]);
+      XLSX.utils.book_append_sheet(wb2,wsMa2,"Macroaree");
       XLSX.writeFile(wb2,"GuidamiVDA_export.xlsx");
       showToast("⚠️ Excel scaricato senza immagini caricate (troppo grandi per Excel). Testo e descrizioni salvati.");
     }catch(err2){alert("Errore download Excel: "+err2.message);}
