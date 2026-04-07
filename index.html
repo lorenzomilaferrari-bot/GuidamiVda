@@ -1028,7 +1028,7 @@ function renderHome(){
   const ds=aD(),tp=(S.data.places||[]).length;
   const allPlaces=S.data.places||[];
   let vetrinaPlaces=allPlaces.filter(isVetrina);
-  if(vetrinaPlaces.length<3){
+  if(vetrinaPlaces.length===0){
     const partners=allPlaces.filter(p=>isPartner(p)&&p.type!=="Evento");
     vetrinaPlaces=partners.length>=3?partners:allPlaces.filter(p=>p.type!=="Evento").slice(0,10);
   }
@@ -1719,7 +1719,7 @@ function initVetrina(){
   const btnR=document.getElementById('vArrowR');
   const STEP=280;
   if(btnL) btnL.addEventListener('click',()=>{pos=Math.max(0,pos-STEP);});
-  if(btnR) btnR.addEventListener('click',()=>{pos=(pos+STEP)%halfW;});
+  if(btnR) btnR.addEventListener('click',()=>{const hw=track.scrollWidth/2;pos=(pos+STEP)%(hw||1);});
 }
 
 /* ═══ SCROLL PROGRESS ═══ */
