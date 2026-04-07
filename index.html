@@ -413,12 +413,9 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
   .toolbar .btn span{display:none}
   .lang-toggle{padding:2px;gap:1px}
   .lang-btn{padding:5px 9px;font-size:10.5px}
-  /* Chips: scroll orizzontale invece di andare a capo su più righe */
-  .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px}
-  .chips::-webkit-scrollbar{display:none}
-  .comune-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px}
-  .comune-chips::-webkit-scrollbar{display:none}
-  /* Filtri: tre colonne ma chips non wrappano */
+  /* Chips: vanno a capo su più righe, tutte visibili */
+  .chips{flex-wrap:wrap}
+  .comune-chips{flex-wrap:wrap}
   .fg{min-width:0;flex-shrink:1}
   .fg-wide{min-width:0}
 }
@@ -435,9 +432,9 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
   /* Filter bar: colonna su iPad portrait per leggibilità */
   .filter-bar{flex-direction:column;gap:12px;padding:18px}
   .fg,.fg-wide{flex:unset;width:100%}
-  /* Chips tornano orizzontali scrollabili (una riga) */
-  .chips{flex-wrap:nowrap}
-  .comune-chips{flex-wrap:nowrap}
+  /* Chips: tutte visibili su più righe */
+  .chips{flex-wrap:wrap}
+  .comune-chips{flex-wrap:wrap}
 }
 
 /* ── Mobile (≤720px) ── */
@@ -475,11 +472,9 @@ img{display:block;max-width:100%}button,a,input,select{font:inherit}a{color:inhe
   .mc-name{font-size:18px}
   .season-toggle{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .season-toggle::-webkit-scrollbar{display:none}
-  /* chips: scroll orizzontale su mobile */
-  .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
-  .chips::-webkit-scrollbar{display:none}
-  .comune-chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:2px}
-  .comune-chips::-webkit-scrollbar{display:none}
+  /* chips: tutte visibili su più righe */
+  .chips{flex-wrap:wrap}
+  .comune-chips{flex-wrap:wrap}
   .ef-grid{grid-template-columns:1fr}
   .ef-full{grid-column:span 1}
   .eventi-grid{grid-template-columns:1fr}
@@ -627,7 +622,7 @@ const PH={
   "Hotel":"https://images.pexels.com/photos/31665649/pexels-photo-31665649.jpeg?auto=compress&cs=tinysrgb&w=1200",
   "Ristoranti":"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80",
   "Bar":"https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=1200&q=80",
-  "Cocktail bar":"https://images.unsplash.com/photo-1527761939622-933c470e8a2b?auto=format&fit=crop&w=1200&q=80",
+  "Cocktail bar":"https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&q=80",
   "Gastronomia / Asporto":"https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=1200&q=80",
   "Escursioni":"https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1200&q=80",
   "Attività":"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80",
@@ -1477,6 +1472,7 @@ function parseWB(wb){
   const pp=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
     slug:slugify(valAt(r,h,["nomeluogo","nome","title"])),
     destination:(()=>{const comune=String(valAt(r,h,["comune","localita","sluglocalita"])||"").trim();if(comune){const slug=slugify(comune);const found=(FALLBACK_DATA.destinations||[]).find(d=>d.slug===slug||slugify(d.name)===slug);if(found)return found.slug;if(slug)return slug;}return macroareaToDestSlug(valAt(r,h,["macroarea"]));})(),
+    _macroRaw:String(valAt(r,h,["macroarea"])||"").trim(),
     title:String(valAt(r,h,["nomeluogo","nome","title"])||"").trim(),
     type:String(valAt(r,h,["tipo","categoria","type","category"])||"Attivit\u00e0").trim(),
     area:String(valAt(r,h,["zona","area"])||"").trim(),
@@ -1499,6 +1495,7 @@ function parseWB(wb){
       if(ma&&!ma.dests.includes(d.slug))ma.dests.push(d.slug);
     }
   });
+  pp.forEach(p=>{if(p._macroRaw&&p.destination){const ma=MACRO_AREAS.find(m=>slugify(m.name)===slugify(p._macroRaw)||m.id===slugify(p._macroRaw));if(ma&&!ma.dests.includes(p.destination))ma.dests.push(p.destination);}delete p._macroRaw;});
   return{destinations:ds,places:pp}}
 
 /* ╔══════════════════════════════════════════════════════════╗
@@ -1769,10 +1766,101 @@ function initEffects(){
 /* ╔══════════════════════════════════════════════════════════╗
    ║  MODULE 10 · INIT — bootstrap, event listeners, load    ║
    ╚══════════════════════════════════════════════════════════╝ */
+
+/* ── Google Sheets config ── incolla qui i tuoi URL CSV ── */
+const GSHEET_LUOGHI_URL  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnQGBkrLlA_7jLG7m8I7P2rMDGmEdjGP0wVLQli10buOYGKMmnqV4BNvGIKVxZAg/pub?output=csv";
+const GSHEET_MACRO_URL   = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQGJWNXJ-TyvjL9GMPYbcsGE2KxPq3ZUsi7uSCtVcLSAqUKkhNhD3qmk3uW_VCx3w/pub?gid=1868679270&single=true&output=csv";
+
+/* ── CSV parser (gestisce virgolette e campi con virgola interna) ── */
+function parseCSV(text){
+  const rows=[];
+  const lines=text.split(/\r?\n/);
+  for(let li=0;li<lines.length;li++){
+    const line=lines[li];
+    if(!line.trim())continue;
+    const cols=[];let cur="",inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'&&inQ&&line[i+1]==='"'){cur+='"';i++;}
+      else if(c==='"'){inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur);cur="";}
+      else cur+=c;
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
+/* ── Applica CSV Macroaree → aggiorna MACRO_AREAS in-place ── */
+function applyCSVMacroaree(csvText){
+  const rows=parseCSV(csvText);
+  if(rows.length<2)return;
+  const h={};(rows[0]||[]).forEach((v,i)=>h[normH(v)]=i);
+  rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).forEach(r=>{
+    const id=String(valAt(r,h,["idmacroarea","id"])||"").trim();
+    const name=String(valAt(r,h,["nomemacroarea","nome","name"])||"").trim();
+    const desc=String(valAt(r,h,["descrizione","description"])||"").trim();
+    const image=String(valAt(r,h,["urlfoto","image","urlfotoopz"])||"").trim();
+    const ma=MACRO_AREAS.find(m=>m.id===id||slugify(m.name)===slugify(id||name));
+    if(ma){if(name)ma.name=name;if(desc)ma.desc=desc;if(image)ma.image=image;}
+  });
+}
+
+/* ── Parse CSV Luoghi → stessa logica di parseWB ── */
+function parseCSVLuoghi(csvText){
+  const rows=parseCSV(csvText);
+  if(rows.length<2)throw new Error("CSV Luoghi vuoto o malformato");
+  const h={};(rows[0]||[]).forEach((v,i)=>h[normH(v)]=i);
+  const pp=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")).map(r=>({
+    slug:slugify(valAt(r,h,["nomeluogo","nome","title"])),
+    destination:(()=>{const comune=String(valAt(r,h,["comune","localita","sluglocalita"])||"").trim();if(comune){const slug=slugify(comune);const found=(FALLBACK_DATA.destinations||[]).find(d=>d.slug===slug||slugify(d.name)===slug);if(found)return found.slug;if(slug)return slug;}return macroareaToDestSlug(valAt(r,h,["macroarea"]));})(),
+    _macroRaw:String(valAt(r,h,["macroarea"])||"").trim(),
+    title:String(valAt(r,h,["nomeluogo","nome","title"])||"").trim(),
+    type:String(valAt(r,h,["tipo","categoria","type","category"])||"Attività").trim(),
+    area:String(valAt(r,h,["zona","area"])||"").trim(),
+    price:String(valAt(r,h,["fasciaprezzo","price"])||"€€").trim(),
+    season:String(valAt(r,h,["stagione","season"])||"Entrambi").trim(),
+    desc:String(valAt(r,h,["descrizione","description"])||"").trim(),
+    website:String(valAt(r,h,["sitoweb","website","link"])||"").trim(),
+    image:String(valAt(r,h,["urlfotoopz","urlfoto","image","imageurl"])||"").trim(),
+    vetrina:["1","s","si","yes","true"].includes(String(valAt(r,h,["invetrina","vetrina","featured"])||"").toLowerCase().trim()),
+    premium:["1","s","si","yes","true"].includes(String(valAt(r,h,["partner","premium","inevidenza","evidenza","top","sponsored"])||"").toLowerCase().trim()),
+    eventDate:String(valAt(r,h,["dataevento","eventdate","date","data"])||"").trim(),
+  }));
+  let ds=deriveDests(pp);
+  const fm=new Map((FALLBACK_DATA.destinations||[]).map(d=>[d.slug,d]));
+  ds=ds.map(d=>{const fb=fm.get(d.slug)||{};return{...fb,...d,name:d.name||fb.name||d.slug,description:d.description||fb.description||"",icons:d.icons||fb.icons||"paese",image:d.image||fb.image||"",website:d.website||fb.website||""}});
+  ds.forEach(d=>{if(d.macroarea){const ma=MACRO_AREAS.find(m=>m.id===d.macroarea||m.name===d.macroarea);if(ma&&!ma.dests.includes(d.slug))ma.dests.push(d.slug);}});
+  pp.forEach(p=>{if(p._macroRaw&&p.destination){const ma=MACRO_AREAS.find(m=>slugify(m.name)===slugify(p._macroRaw)||m.id===slugify(p._macroRaw));if(ma&&!ma.dests.includes(p.destination))ma.dests.push(p.destination);}delete p._macroRaw;});
+  return{destinations:ds,places:pp};
+}
+
+/* ── loadBundled: prova Google Sheets → xlsx locale → fallback ── */
 async function loadBundled(){
+  // 1. Google Sheets (se configurato)
+  if(GSHEET_LUOGHI_URL){
+    try{
+      const bust="&_t="+Date.now();
+      const [rL,rM]=await Promise.all([
+        fetch(GSHEET_LUOGHI_URL+bust),
+        GSHEET_MACRO_URL?fetch(GSHEET_MACRO_URL+bust):Promise.resolve(null)
+      ]);
+      if(!rL.ok)throw new Error("Sheet non raggiungibile ("+rL.status+")");
+      const csvL=await rL.text();
+      if(rM&&rM.ok)applyCSVMacroaree(await rM.text());
+      S.data=parseCSVLuoghi(csvL);
+      const ora=new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+      S.src="🟢 Google Sheets · aggiornato alle "+ora;
+      S.view="home";S.dest=null;render();history.replaceState(snapS(),"");
+      return;
+    }catch(e){console.warn("Google Sheets non raggiungibile, uso dati locali:",e.message);}
+  }
+  // 2. Excel locale (./data/GuidamiVDA_data.xlsx)
   try{const r=await fetch("./data/GuidamiVDA_data.xlsx",{cache:"no-store"});if(!r.ok)throw 0;const b=await r.arrayBuffer();S.data=parseWB(XLSX.read(b,{type:"array"}));S.src="Excel incluso"}
   catch{S.data=FALLBACK_DATA;S.src="Dataset integrato (204 schede)"}
-  S.view="home";S.dest=null;render();history.replaceState(snapS(),"");}
+  S.view="home";S.dest=null;render();history.replaceState(snapS(),"");
+}
 document.getElementById("xlsInput").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{const b=await f.arrayBuffer();S.data=parseWB(XLSX.read(b,{type:"array"}));S.src="Excel: "+f.name;nav("home")}catch(err){alert("Errore: "+err.message)}});
 document.getElementById("reloadBtn").addEventListener("click",loadBundled);
 loadBundled();
